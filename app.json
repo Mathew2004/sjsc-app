@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "SJSC ",
+    "name": "SJSC",
     "slug": "sjsc-app",
     "version": "1.0.0",
-    "sdkVersion": "48.0.0" ,
+    "sdkVersion": "48.0.0",
     "orientation": "portrait",
     "icon": "https://assets.chorcha.net/oOGqtqAZZ8bxZ_scKZ13M.png",
     "userInterfaceStyle": "light",
@@ -14,10 +14,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "."
     },
     "android": {
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
       "adaptiveIcon": {
         "foregroundImage": "https://assets.chorcha.net/oOGqtqAZZ8bxZ_scKZ13M.png",
         "backgroundColor": "#ffffff"
