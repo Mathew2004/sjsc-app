@@ -267,6 +267,7 @@ const Marks = () => {
                         placeholder="Select School or College"
                         style={styles.dropdown}
                         zIndex={4000}
+                        listMode="SCROLLVIEW"
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
 
@@ -283,6 +284,7 @@ const Marks = () => {
                                 placeholder="Select Shift"
                                 style={styles.dropdown}
                                 zIndex={3300}
+                                listMode="SCROLLVIEW"
                                 dropDownContainerStyle={styles.dropdownContainer}
                             />
                         </>
@@ -300,6 +302,7 @@ const Marks = () => {
                         placeholder="Select Class"
                         style={styles.dropdown}
                         zIndex={3000}
+                        listMode="SCROLLVIEW"
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
 
@@ -315,6 +318,7 @@ const Marks = () => {
                         placeholder="Select Group"
                         style={styles.dropdown}
                         zIndex={2000}
+                        listMode="SCROLLVIEW"
                         disabled={!classValue}
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
@@ -331,6 +335,7 @@ const Marks = () => {
                         placeholder="Select Section"
                         style={styles.dropdown}
                         zIndex={1000}
+                        listMode="SCROLLVIEW"
                         disabled={!classValue}
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
@@ -346,6 +351,7 @@ const Marks = () => {
                         placeholder="Select Exam"
                         style={styles.dropdown}
                         zIndex={100}
+                        listMode="SCROLLVIEW"
                         disabled={!classValue}
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
@@ -361,6 +367,7 @@ const Marks = () => {
                         placeholder="Select Subject"
                         style={styles.dropdown}
                         zIndex={80}
+                        listMode="SCROLLVIEW"
                         disabled={!classValue}
                         dropDownContainerStyle={styles.dropdownContainer}
                     />

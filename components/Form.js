@@ -93,7 +93,7 @@ const TeacherDropdownForm = () => {
     useFocusEffect(
         React.useCallback(() => {
             return () => {
-                setOpenSchool(false); 
+                setOpenSchool(false);
             };
         }, [])
     );
@@ -231,7 +231,7 @@ const TeacherDropdownForm = () => {
             >
                 {/* Level Dropdown */}
                 <Text style={styles.label}>Level</Text>
-                
+
                 <DropDownPicker
                     open={openSchool}
                     value={schoolValue}
@@ -242,6 +242,7 @@ const TeacherDropdownForm = () => {
                     placeholder="Select School or College"
                     style={styles.dropdown}
                     zIndex={4000}
+                    listMode="SCROLLVIEW"
                     dropDownContainerStyle={styles.dropdownContainer}
                 />
 
@@ -258,6 +259,7 @@ const TeacherDropdownForm = () => {
                             placeholder="Select Shift"
                             style={styles.dropdown}
                             zIndex={3300}
+                            listMode="SCROLLVIEW"
                             dropDownContainerStyle={styles.dropdownContainer}
                         />
                     </>
@@ -276,6 +278,7 @@ const TeacherDropdownForm = () => {
                     style={styles.dropdown}
                     disabled={!schoolValue}
                     zIndex={3000}
+                    listMode="SCROLLVIEW"
                     dropDownContainerStyle={styles.dropdownContainer}
                 />
 
@@ -291,6 +294,7 @@ const TeacherDropdownForm = () => {
                     placeholder="Select Group"
                     style={styles.dropdown}
                     zIndex={2000}
+                    listMode="SCROLLVIEW"
                     disabled={!classValue}
                     dropDownContainerStyle={styles.dropdownContainer}
                 />
@@ -307,6 +311,7 @@ const TeacherDropdownForm = () => {
                     placeholder="Select Section"
                     style={styles.dropdown}
                     zIndex={1000}
+                    listMode="SCROLLVIEW"
                     disabled={!classValue}
                 // dropDownContainerStyle={styles.dropdownContainer}
                 />

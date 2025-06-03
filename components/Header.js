@@ -10,58 +10,62 @@ const Header = () => {
     return (
         <View style={styles.header}>
             {/* Center Image */}
-            <View style={{
-                flex: 1, flexDirection: "row", alignItems: "center", gap: 10
-            }}>
-                <Image source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }} style={{ width: 60, height: 60 }} />
+            <View style={styles.centerView}>
+                <Image
+                    source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }}
+                    style={styles.centerImage}
+                />
                 <View>
-                    <Text style={{
-                        fontWeight: "bold"
-                    }}>
-                        St. Joseph's School & College
-                    </Text>
-                    <Text>
-                        Bonpara, Natore
-                    </Text>
+                    <Text style={styles.headerTextBold}>St. Joseph's School & College</Text>
+                    <Text>Bonpara, Natore</Text>
                 </View>
             </View>
 
             {/* Right-end Image with Text (User) */}
-            <TouchableOpacity
-                onPress={() => goProfile()}
-                style={{
-                    flex: "row", alignItems: "center", justifyContent: "space-between"
-                }}>
-                <Image source={{ uri: "https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png" }}
-                    style={{ width: 30, height: 30, borderRadius: 50, }}
+            <TouchableOpacity onPress={goProfile} style={styles.profileButton}>
+                <Image
+                    source={{ uri: "https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png" }}
+                    style={styles.profileImage}
                 />
-
             </TouchableOpacity>
         </View>
-
     );
 };
-
 
 const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 20,
-        height: 160,
-        borderRadius: 15,
         padding: 15,
-        marginBottom: 10,
-        // backgroundColor: '#0f0c29'
+        // marginBottom: 1,
+        height: 120,
+        borderRadius: 15,
+        backgroundColor: '#f1f1f1', // Add some background color to differentiate the header
     },
-    text: {
-        // color: '#fff',
-        fontSize: 20,
-        textAlign: 'left',
-        maxWidth: 260,
+    centerView: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10, // Space between image and text
+    },
+    centerImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 30, // Ensuring the image is round
+    },
+    headerTextBold: {
         fontWeight: 'bold',
-    }
+    },
+    profileButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    profileImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 15, // Make the profile image round
+    },
 });
 
 export default Header;

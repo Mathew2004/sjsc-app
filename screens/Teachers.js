@@ -31,7 +31,7 @@ const fetchTeachers = async (signal) => {
 
 const TeacherCard = React.memo(({ teacher }) => (
     <ListItem containerStyle={styles.cardContainer} onPress={() => Linking.openURL(`tel:${teacher.phone}`)}>
-        <Avatar rounded size="medium" source={{ uri: teacher.extra?.image || `https://www.gravatar.com/avatar/${teacher.name}?d=robohash&s=400` }} />
+        <Avatar rounded size="medium" source={{ uri: teacher.extra?.image || `https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png` }} />
         <ListItem.Content>
             <ListItem.Title style={styles.name}>{teacher.name}</ListItem.Title>
             <View style={{
@@ -175,11 +175,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFF",
         borderRadius: 10,
         paddingHorizontal: 15,
-        paddingVertical: 10,
+        paddingVertical: 5,
         fontSize: 14,
         color: "#333",
         marginBottom: 10,
-        shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -189,11 +188,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginVertical: 5,
         backgroundColor: "#FFF",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
     },
     name: {
         fontWeight: "600",

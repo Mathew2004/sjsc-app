@@ -1,38 +1,34 @@
 {
   "expo": {
-    "name": "SJSC",
+    "name": "SJSC ",
     "slug": "sjsc-app",
-    "version": "1.0.0",
-    "sdkVersion": "48.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "https://assets.chorcha.net/oOGqtqAZZ8bxZ_scKZ13M.png",
+    "icon": "./assets/sjsc.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "https://assets.chorcha.net/oOGqtqAZZ8bxZ_scKZ13M.png",
+      "image": "./assets/sjsc.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "."
+      "supportsTablet": true
     },
     "android": {
+      "versionCode": 2,  
       "adaptiveIcon": {
-        "foregroundImage": "https://assets.chorcha.net/oOGqtqAZZ8bxZ_scKZ13M.png",
+        "foregroundImage": "./assets/sjsc.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.evangel_matt.sjscapp"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.evangel_matt.sjscapp",
+      "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb"
     },
     "extra": {
       "eas": {
         "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb"
       }
-    },
-    "plugins": ["expo-image-picker"],
-    "jsEngine": "hermes"
-  }
+    }
+  },
+  "jsEngine": "hermes"
 }

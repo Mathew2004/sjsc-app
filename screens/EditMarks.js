@@ -1,17 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 
 export default function EditMarks() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { className,sectionName, groupName, examName,
+    const { className, sectionName, groupName, examName,
         groupId, sectionId, shift, markId,
         mcq, written, practical, quiz } = route.params || {};
 
-    console.log(className,sectionName, groupName, examName)
+    console.log(className, sectionName, groupName, examName)
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [marks, setMarks] = useState({});
@@ -88,6 +88,29 @@ export default function EditMarks() {
         }
     };
 
+    const inputRefs = useRef({});
+
+    const setInputRef = (studentId, field) => (ref) => {
+        if (!inputRefs.current[studentId]) inputRefs.current[studentId] = {};
+        inputRefs.current[studentId][field] = ref;
+    };
+
+    // Focus same field in next student
+    const focusNextInput = (currentStudentId, field) => {
+        const students = data.map((s) => s.id);
+        const currentIndex = students.indexOf(currentStudentId);
+        if (currentIndex === -1) return;
+
+        for (let i = currentIndex + 1; i < students.length; i++) {
+            const nextStudentId = students[i];
+            const nextRef = inputRefs.current[nextStudentId]?.[field];
+            if (nextRef) {
+                nextRef.focus();
+                return;
+            }
+        }
+    };
+
 
     if (loading || !data) {
         return (
@@ -97,17 +120,12 @@ export default function EditMarks() {
         );
     }
 
-    // console.log(marks["1775"].quiz);
-
     return (
 
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1 }}>
             <ScrollView
-                // keyboardShouldPersistTaps="handled"
-                // keyboardDismissMode="on-drag"
-                // removeClippedSubviews={true}
                 scrollEventThrottle={16}
                 contentContainerStyle={styles.scrollView}>
                 <View style={styles.container}>
@@ -129,7 +147,7 @@ export default function EditMarks() {
                                 gap: 10,
                                 marginBottom: 10,
                             }}>
-                                <Text style={styles.studentRoll }>{item?.Student?.roll} - {item?.Student?.name}</Text>
+                                <Text style={styles.studentRoll}>{item?.Student?.roll} - {item?.Student?.name}</Text>
                                 {quiz && (
                                     <TextInput
                                         style={styles.input}
@@ -137,6 +155,8 @@ export default function EditMarks() {
                                         keyboardType="numeric"
                                         value={String(marks[item.Student?.id]?.quiz || '')}
                                         onChangeText={text => handleInputChange(item.Student?.id, 'quiz', text)}
+                                        ref={setInputRef(item.id, 'quiz')}
+                                        onSubmitEditing={() => focusNextInput(item.id, 'quiz')}
                                     />
                                 )}
                             </View>
@@ -148,6 +168,8 @@ export default function EditMarks() {
                                         keyboardType="numeric"
                                         value={String(marks[item.Student.id]?.mcq)}
                                         onChangeText={text => handleInputChange(item.Student.id, 'mcq', text)}
+                                        ref={setInputRef(item.id, 'mcq')}
+                                        onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
                                     />
                                 )}
                                 {written && (
@@ -157,6 +179,8 @@ export default function EditMarks() {
                                         keyboardType="numeric"
                                         value={String(marks[item.Student.id].written)}
                                         onChangeText={text => handleInputChange(item.Student.id, 'written', text)}
+                                        ref={setInputRef(item.id, 'written')}
+                                        onSubmitEditing={() => focusNextInput(item.id, 'written')}
                                     />
                                 )}
                                 {practical && (
@@ -166,6 +190,8 @@ export default function EditMarks() {
                                         keyboardType="numeric"
                                         value={String(marks[item.Student.id]?.practical)}
                                         onChangeText={text => handleInputChange(item.Student.id, 'practical', text)}
+                                        ref={setInputRef(item.id, 'practical')}
+                                        onSubmitEditing={() => focusNextInput(item.id, 'practical')}
                                     />
                                 )}
 

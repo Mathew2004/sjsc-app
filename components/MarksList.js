@@ -50,36 +50,36 @@ const MarksList = ({ navigation }) => {
 
     const handleButtonPress = (item) => {
         navigation.navigate('TakeMarks', {
-            classId: item.classId,
-            groupId: item.groupId,
-            sectionId: item.sectionId,
-            marksId: item.id,
-            markId: item.id,
-            examName: item.Exam.name,
-            teacherId: item.teacherId,
-            mcq: item.Exam.mcq,
-            written: item.Exam.written,
-            practical: item.Exam.practical,
-            quiz: item.Exam.quiz,
+            classId: item?.classId,
+            groupId: item?.groupId,
+            sectionId: item?.sectionId,
+            marksId: item?.id,
+            markId: item?.id,
+            examName: item.Exam?.name,
+            teacherId: item?.teacherId,
+            mcq: item.Exam?.mcq,
+            written: item.Exam?.written,
+            practical: item.Exam?.practical,
+            quiz: item.Exam?.quiz,
         });
     };
 
     const handleTakeMarks = (item) => {
         navigation.navigate('EditMarks', {
-            classId: item.classId,
-            groupId: item.groupId,
-            sectionId: item.sectionId,
-            markId: item.id,
-            examName: item.Exam.name,
-            className: item.Class.name,
-            groupName: item.Group.name,
-            sectionName: item.Section.name,
-            shift: item.shift,
-            teacherId: item.teacherId,
-            mcq: item.Exam.mcq,
-            written: item.Exam.written,
-            practical: item.Exam.practical,
-            quiz: item.Exam.quiz,
+            classId: item?.classId,
+            groupId: item?.groupId,
+            sectionId: item?.sectionId,
+            markId: item?.id,
+            examName: item.Exam?.name,
+            className: item.Class?.name,
+            groupName: item.Group?.name,
+            sectionName: item.Section?.name,
+            shift: item?.shift,
+            teacherId: item?.teacherId,
+            mcq: item.Exam?.mcq,
+            written: item.Exam?.written,
+            practical: item.Exam?.practical,
+            quiz: item.Exam?.quiz,
         });
     };
 

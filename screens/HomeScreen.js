@@ -2,7 +2,6 @@ import React from 'react';
 import { Button, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Card from '../components/Card';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Menus = [
     {
@@ -21,18 +20,20 @@ const Menus = [
         href: 'Notice',
     },
     {
-        item: 'Teachers',
-        icon: require('../assets/icons/teacher.png'),
-        href: 'Teachers',
-    },
-    {
         item: 'Marks Sheets',
         icon: require('../assets/icons/marks-history.png'),
         href: 'MarksList',
     },
+    {
+        item: 'Teachers',
+        icon: require('../assets/icons/teacher.png'),
+        href: 'Teachers',
+    },
+    
 ];
 
 export default function HomeScreen() {
+    console.log("Home");
     return (
         <View>
            
@@ -56,18 +57,4 @@ export default function HomeScreen() {
 };
 
 
-{/* Add A Logout And When It press it delete token form AsynStorage */ }
-{/* <TouchableOpacity
-                style={{
-                    padding: 10,
-                    backgroundColor: 'red',
-                    borderRadius: 5,
-                    alignItems: 'center',
-                }}
-            onPress={() => {
-                AsyncStorage.removeItem('token');
-                navigation.navigate('Login');
-            }}>
-                <Text>Logout</Text>
-            </TouchableOpacity> */}
 

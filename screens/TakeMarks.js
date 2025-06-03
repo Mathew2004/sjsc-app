@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
 
 export default function TakeMarks() {
@@ -87,6 +87,29 @@ export default function TakeMarks() {
         }
     };
 
+    const inputRefs = useRef({});
+
+    const setInputRef = (studentId, field) => (ref) => {
+        if (!inputRefs.current[studentId]) inputRefs.current[studentId] = {};
+        inputRefs.current[studentId][field] = ref;
+    };
+
+    // Focus same field in next student
+    const focusNextInput = (currentStudentId, field) => {
+        const students = data.map((s) => s.id);
+        const currentIndex = students.indexOf(currentStudentId);
+        if (currentIndex === -1) return;
+
+        for (let i = currentIndex + 1; i < students.length; i++) {
+            const nextStudentId = students[i];
+            const nextRef = inputRefs.current[nextStudentId]?.[field];
+            if (nextRef) {
+                nextRef.focus();
+                return;
+            }
+        }
+    };
+
     if (loading || !data) {
         return (
             <View style={styles.center}>
@@ -110,7 +133,7 @@ export default function TakeMarks() {
             </Text>
             <ScrollView contentContainerStyle={styles.scrollView}>
 
-                {data.map(item => (
+                {data.map((item, index) => (
                     <View key={item.id} style={styles.studentCard}>
                         <View style={{
                             flexDirection: 'row',
@@ -127,6 +150,9 @@ export default function TakeMarks() {
                                     keyboardType="numeric"
                                     value={marks[item.id]?.quiz || ''}
                                     onChangeText={text => handleInputChange(item.id, 'quiz', text)}
+                                    returnKeyType="next"
+                                    ref={setInputRef(item.id, 'quiz')}
+                                    onSubmitEditing={() => focusNextInput(item.id, 'quiz')}
                                 />
                             )}
                         </View>
@@ -138,6 +164,9 @@ export default function TakeMarks() {
                                     keyboardType="numeric"
                                     value={marks[item.id]?.mcq || ''}
                                     onChangeText={text => handleInputChange(item.id, 'mcq', text)}
+                                    returnKeyType="next"
+                                    ref={setInputRef(item.id, 'mcq')}
+                                    onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
                                 />
                             )}
                             {written && (
@@ -147,6 +176,9 @@ export default function TakeMarks() {
                                     keyboardType="numeric"
                                     value={marks[item.id]?.written || ''}
                                     onChangeText={text => handleInputChange(item.id, 'written', text)}
+                                    returnKeyType="next"
+                                    ref={setInputRef(item.id, 'written')}
+                                    onSubmitEditing={() => focusNextInput(item.id, 'written')}
                                 />
                             )}
                             {practical && (
@@ -156,6 +188,9 @@ export default function TakeMarks() {
                                     keyboardType="numeric"
                                     value={marks[item.id]?.practical || ''}
                                     onChangeText={text => handleInputChange(item.id, 'practical', text)}
+                                    returnKeyType="next"
+                                    ref={setInputRef(item.id, 'practical')}
+                                    onSubmitEditing={() => focusNextInput(item.id, 'practical')}
                                 />
                             )}
 

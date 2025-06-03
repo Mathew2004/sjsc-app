@@ -13,20 +13,20 @@ const UpdateProfileForm = ({ setValue }) => {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
-    const [dept, setDept] = useState("");
+    // const [dept, setDept] = useState("");
 
-    const [image, setImage] = useState(null);
-    const [file, setFile] = useState(null);
+    // const [image, setImage] = useState(null);
+    // const [file, setFile] = useState(null);
 
-    const [positionItems, setPositionItems] = useState([
-        { label: "Lecturer", value: "Lecturer" },
-        { label: "Assistant Professor", value: "Assistant Professor" },
-        { label: "Professor", value: "Professor" }
-    ]);
-    const [positionValue, setPositionValue] = useState(null);
-    const [openPosition, setOpenPosition] = useState(false);
+    // const [positionItems, setPositionItems] = useState([
+    //     { label: "Lecturer", value: "Lecturer" },
+    //     { label: "Assistant Professor", value: "Assistant Professor" },
+    //     { label: "Professor", value: "Professor" }
+    // ]);
+    // const [positionValue, setPositionValue] = useState(null);
+    // const [openPosition, setOpenPosition] = useState(false);
 
-    const [imageUri, setImageUri] = useState(null);
+    // const [imageUri, setImageUri] = useState(null);
 
 
 
@@ -42,13 +42,13 @@ const UpdateProfileForm = ({ setValue }) => {
             });
 
             if (response.status === 200) {
-                const { name, email, phone, password, extra } = response.data.teacher;
+                const { name, email, phone, password } = response.data.teacher;
                 setName(name);
                 setEmail(email);
                 setPhone(phone);
                 setPassword(password);
-                setDept(extra?.dept || "");
-                setPositionValue(extra?.position || "");
+                // setDept(extra?.dept || "");
+                // setPositionValue(extra?.position || "");
             }
         } catch (error) {
             console.error("Error fetching teacher data:", error);
@@ -73,8 +73,8 @@ const UpdateProfileForm = ({ setValue }) => {
             email,
             phone,
             password,
-            dept,
-            position: positionValue,
+            // dept,
+            // position: positionValue,
         };
 
         try {
@@ -175,10 +175,21 @@ const UpdateProfileForm = ({ setValue }) => {
                 />
             </View>
 
+            
             {/* Password Field */}
             <View style={styles.inputContainer}>
+                <Text style={styles.label}>Password</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter your Password"
+                    value={password}
+                    onChangeText={setPassword}
+                />
+            </View>
+
+            {/* Position Field */}
+            {/* <View style={styles.inputContainer}>
                 <Text style={styles.label}>Position</Text>
-                {/* DropDown with lecturer, Asistant Prof. , Prof. */}
                 <DropDownPicker
                     open={openPosition}
                     value={positionValue}
@@ -188,6 +199,7 @@ const UpdateProfileForm = ({ setValue }) => {
                     setItems={setPositionItems}
                     placeholder="Select your position"
                     style={{ backgroundColor: "#fff" }}
+                    listMode="SCROLLVIEW"
                     dropDownContainerStyle={{ backgroundColor: "#fff" }}
                 />
 
@@ -201,7 +213,7 @@ const UpdateProfileForm = ({ setValue }) => {
                     value={dept}
                     onChangeText={setDept}
                 />
-            </View>
+            </View> */}
 
             {/* Submit Button */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -230,7 +242,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#f5f5f5",
     },
     header: {
-        fontSize: 24,
+        fontSize: 18,
         fontWeight: "bold",
         marginBottom: 24,
         color: "#333",
@@ -240,7 +252,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     label: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
         marginBottom: 8,
         color: "#333",
@@ -255,14 +267,14 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: "#007bff",
-        padding: 16,
+        padding: 12,
         borderRadius: 8,
         alignItems: "center",
         marginTop: 24,
     },
     buttonText: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
     },
 });
