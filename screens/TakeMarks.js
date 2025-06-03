@@ -11,7 +11,7 @@ export default function TakeMarks() {
         examName,
         mcq, written, practical, quiz } = route.params || {};
 
-    // console.log('TakeMarks', route.params);
+    console.log('TakeMarks', route.params);
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -64,6 +64,7 @@ export default function TakeMarks() {
 
             const response = await axios.post(
                 `https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks`,
+                // 'https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks',
                 {
                     marksId: markId,
                     records: studentRecords,

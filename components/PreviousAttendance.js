@@ -65,7 +65,7 @@ const AttendanceReport = () => {
   };
 
   const handleTakeAttendance = (item) => {
-    // console.log('Take attendance for:', item);
+    console.log('Take attendance for:', item);
     if (navigation.canGoBack()) {
       navigation.navigate('TakeAttendance', {
         classId: item.classId,

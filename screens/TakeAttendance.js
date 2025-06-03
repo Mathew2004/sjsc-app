@@ -11,7 +11,7 @@ export default function TakeAttendance() {
 
     const route = useRoute();
     const { classId, groupId, sectionId, shift, attendanceId } = route.params || {};
-    // console.log("shift", shift);
+    console.log("shift", shift);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedStudents, setSelectedStudents] = useState([]);
@@ -78,8 +78,8 @@ export default function TakeAttendance() {
                 status: selectedStudents.includes(student.id) ? "Present" : "Absent",
             }));
 
-            // console.log("Student Records", studentRecords);
-            // console.log("Attendance ID", attendanceId);
+            console.log("Student Records", studentRecords);
+            console.log("Attendance ID", attendanceId);
             // Submit attendance data
             const response = await axios.post(
                 `https://sjsc-backend-production.up.railway.app/api/v1/attendance/take/attendance`,
@@ -121,6 +121,60 @@ export default function TakeAttendance() {
     }
 
     return (
+        // <View style={styles.container}>
+        //     <View style={{
+        //         flexDirection: 'row',
+        //         justifyContent: 'flex-end',
+        //         alignItems: 'center',
+        //         padding: 6,
+        //     }}>
+        //         {/* <Text style={{ fontSize: 16, fontWeight: 'bold' }}
+        //         >{className} | {groupName} | {sectionName || ""}  </Text> */}
+        //         <TouchableOpacity
+        //             style={{ padding: 1, color: 'blue' }}
+        //             onPress={ToggleselectAll}
+        //         >
+        //             <Text>{selectedStudents.length === data.length ? 'Deselect All' : 'Select All'}</Text>
+        //         </TouchableOpacity>
+        //     </View>
+
+        //     {data.length === 0 && <Text style={{
+        //         color: 'red',
+        //         fontSize: 16,
+        //         textAlign: 'center',
+        //         marginTop: 20
+        //     }}>No students found</Text>}
+        //     <FlatList
+        //         data={data}
+        //         keyExtractor={item => item.id.toString()}
+        //         renderItem={({ item }) => (
+        //             <TouchableOpacity
+        //                 style={styles.dropdown}
+        //                 onPress={() => ToggleStudent(item.id)}
+        //             >
+        //                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "start", padding: 10 }}>
+        //                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        //                         <Text>{item.roll}</Text>
+        //                         {/* <Image source={{ uri: "https://i.ibb.co.com/zWb8jL6w/360-F-77711294-BA5-QTjtg-GPm-LKCXGdtb-Ag-Zci-L4k-Ew-Cnx.jpg" }}
+        //                             style={{ width: 30, height: 30 }}
+        //                         /> */}
+        //                     </View>
+        //                     <Text>{item.name}</Text>
+        //                     <Text>{selectedStudents.includes(item.id) ? '✅' : '⬜'}</Text>
+        //                 </View>
+        //             </TouchableOpacity>
+        //         )}
+        //     />
+
+        //     <TouchableOpacity
+        //         style={styles.submitButton}
+        //         onPress={() => handleSubmit()}
+        //     >
+        //         {proccessing ? <ActivityIndicator color="white" /> : null}
+        //         <Text style={{ color: 'white', textAlign: 'center' }}>Submit</Text>
+        //     </TouchableOpacity>
+
+        // </View>
         <View style={styles.container}>
             <View
                 style={{

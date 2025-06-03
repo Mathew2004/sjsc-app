@@ -25,13 +25,14 @@
       "package": "com.evangel_matt.sjscapp"
     },
     "web": {
-      "favicon": "https://assets.chorcha.net/oOGqtqAZZ8bxZ_scKZ13M.png"
+      "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
         "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb"
       }
     },
+    "plugins": ["expo-image-picker"],
     "jsEngine": "hermes"
   }
 }

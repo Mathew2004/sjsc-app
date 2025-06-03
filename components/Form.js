@@ -7,7 +7,6 @@ import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from '@react-navigation/native';
-import { Alert } from 'react-native';
 
 
 const TeacherDropdownForm = () => {
@@ -59,16 +58,6 @@ const TeacherDropdownForm = () => {
 
     const [submitting, setSubmitting] = useState(false);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            return () => {
-                // This runs when the screen is about to unmount (navigate back)
-                // Alert.alert("Test", "Navigating back - Closing dropdown");
-                setOpenSchool(false); // Ensure dropdown is closed
-            };
-        }, [])
-    );
-
     // Fetch Teacher Data
     useEffect(() => {
         const fetchTeacherData = async () => {
@@ -104,7 +93,7 @@ const TeacherDropdownForm = () => {
     useFocusEffect(
         React.useCallback(() => {
             return () => {
-                setOpenSchool(false);
+                setOpenSchool(false); 
             };
         }, [])
     );
@@ -236,14 +225,13 @@ const TeacherDropdownForm = () => {
     }
 
     return (
-        <ScrollView
-            keyboardShouldPersistTaps="handled"
-            nestedScrollEnabled={true}
-            contentContainerStyle={{ flexGrow: 1 }}
-        >
-            <View style={styles.container}>
+        <ScrollView>
+            <View
+                style={styles.container}
+            >
                 {/* Level Dropdown */}
                 <Text style={styles.label}>Level</Text>
+                
                 <DropDownPicker
                     open={openSchool}
                     value={schoolValue}
@@ -254,8 +242,6 @@ const TeacherDropdownForm = () => {
                     placeholder="Select School or College"
                     style={styles.dropdown}
                     zIndex={4000}
-                    zIndexInverse={1000}
-                    listMode="SCROLLVIEW"
                     dropDownContainerStyle={styles.dropdownContainer}
                 />
 
@@ -272,8 +258,6 @@ const TeacherDropdownForm = () => {
                             placeholder="Select Shift"
                             style={styles.dropdown}
                             zIndex={3300}
-                            zIndexInverse={2000}
-                            listMode="SCROLLVIEW"
                             dropDownContainerStyle={styles.dropdownContainer}
                         />
                     </>
@@ -290,11 +274,9 @@ const TeacherDropdownForm = () => {
                     setItems={setClassItems}
                     placeholder="Select Class"
                     style={styles.dropdown}
-                    zIndex={3000}
-                    zIndexInverse={1500}
-                    listMode="SCROLLVIEW"
-                    dropDownContainerStyle={styles.dropdownContainer}
                     disabled={!schoolValue}
+                    zIndex={3000}
+                    dropDownContainerStyle={styles.dropdownContainer}
                 />
 
                 {/* Group Dropdown */}
@@ -309,10 +291,8 @@ const TeacherDropdownForm = () => {
                     placeholder="Select Group"
                     style={styles.dropdown}
                     zIndex={2000}
-                    zIndexInverse={1000}
-                    listMode="SCROLLVIEW"
-                    dropDownContainerStyle={styles.dropdownContainer}
                     disabled={!classValue}
+                    dropDownContainerStyle={styles.dropdownContainer}
                 />
 
                 {/* Section Dropdown */}
@@ -327,19 +307,26 @@ const TeacherDropdownForm = () => {
                     placeholder="Select Section"
                     style={styles.dropdown}
                     zIndex={1000}
-                    zIndexInverse={500}
-                    listMode="SCROLLVIEW"
                     disabled={!classValue}
+                // dropDownContainerStyle={styles.dropdownContainer}
                 />
 
                 {/* Date Picker */}
                 <Text style={styles.label}>Date</Text>
-                <TouchableOpacity style={styles.datePicker} onPress={() => setShowPicker(true)}>
+                <TouchableOpacity
+                    style={styles.datePicker}
+                    onPress={() => setShowPicker(true)}
+                >
                     <Text style={styles.dateText}>📅 {date.toDateString()}</Text>
                 </TouchableOpacity>
 
                 {showPicker && (
-                    <DateTimePicker value={date} mode="date" display="default" onChange={onChange} />
+                    <DateTimePicker
+                        value={date}
+                        mode="date"
+                        display="default"
+                        onChange={onChange}
+                    />
                 )}
 
                 {/* Submit Button */}
@@ -351,7 +338,6 @@ const TeacherDropdownForm = () => {
                 )}
             </View>
         </ScrollView>
-
     );
 };
 

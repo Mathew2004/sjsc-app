@@ -31,7 +31,7 @@ const fetchTeachers = async (signal) => {
 
 const TeacherCard = React.memo(({ teacher }) => (
     <ListItem containerStyle={styles.cardContainer} onPress={() => Linking.openURL(`tel:${teacher.phone}`)}>
-        <Avatar rounded size="medium" source={{ uri: teacher.extra?.image || `https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png` }} />
+        <Avatar rounded size="medium" source={{ uri: teacher.extra?.image || `https://www.gravatar.com/avatar/${teacher.name}?d=robohash&s=400` }} />
         <ListItem.Content>
             <ListItem.Title style={styles.name}>{teacher.name}</ListItem.Title>
             <View style={{
@@ -112,6 +112,29 @@ export default function TeacherScreen() {
 
 
     return (
+        // <View style={styles.container}>
+        //     <TextInput
+        //         style={styles.searchBar}
+        //         placeholder="Search teachers..."
+        //         value={searchQuery}
+        //         onChangeText={setSearchQuery}
+        //     />
+        //     {loading ? (
+        //         <ActivityIndicator size="large" color="#6C63FF" />
+        //     ) : (
+        //         filteredTeachers.length > 0 ? (
+        //             <FlatList
+        //                 data={filteredTeachers}
+        //                 keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+        //                 renderItem={({ item }) => <TeacherCard teacher={item} />}
+        //                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadTeachers()} />}
+        //             />
+        //         ) : (
+        //             <Text style={styles.emptyText}>No teachers found.</Text>
+        //         )
+
+        //     )}
+        // </View>
         <View style={styles.container}>
             <TextInput
                 style={styles.searchBar}
@@ -166,11 +189,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginVertical: 5,
         backgroundColor: "#FFF",
-        // shadowColor: "#000",
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 4,
-        // elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     name: {
         fontWeight: "600",

@@ -21,14 +21,14 @@ const Menus = [
         href: 'Notice',
     },
     {
-        item: 'Marks Sheets',
-        icon: require('../assets/icons/marks-history.png'),
-        href: 'MarksList',
-    },
-    {
         item: 'Teachers',
         icon: require('../assets/icons/teacher.png'),
         href: 'Teachers',
+    },
+    {
+        item: 'Marks Sheets',
+        icon: require('../assets/icons/marks-history.png'),
+        href: 'MarksList',
     },
 ];
 
