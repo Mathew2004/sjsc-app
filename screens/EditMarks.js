@@ -11,24 +11,38 @@ export default function EditMarks() {
         groupId, sectionId, shift, markId,
         mcq, written, practical, quiz } = route.params || {};
 
-    console.log(className, sectionName, groupName, examName)
     const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [marks, setMarks] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [teacher_id, setTeacherId] = useState(null);
+
 
     useFocusEffect(
         useCallback(() => {
+            fetchTeacherId();
             fetchStudents();
         }, [])
     );
+
+    async function fetchTeacherId() {
+        try {
+
+            const teacher_id = await AsyncStorage.getItem('teacher-id');
+            setTeacherId(teacher_id);
+        }
+        catch (error) {
+            console.error('Error fetching teacher ID:', error);
+        }
+    }
 
     const fetchStudents = async () => {
         try {
             setLoading(true);
             const res = await axios.get(
                 `https://sjsc-backend-production.up.railway.app/api/v1/marks?marksId=${markId}`,
-                // `https://sjsc-backend-production.up.railway.app/api/v1/marks?markId=${markId}`
+                // `http://192.168.0.108:3000/api/v1/marks?marksId=${markId}`
             );
             // console.log(res.data.marksReport.Marks);
             const students = res.data.marksReport.Marks;
@@ -40,13 +54,13 @@ export default function EditMarks() {
                     mcq: student.mcq || '',
                     written: student.written || '',
                     practical: student.practical || '',
-                    quiz: student.quiz || ''
+                    quiz: student.quiz || '',
+                    teacherId: student.teacherId || null,
                 };
             });
 
-            console.log(initialMarks);
-
             setData(students);
+            setFilteredData(students);
             setMarks(initialMarks);
             setLoading(false);
         } catch (error) {
@@ -56,7 +70,10 @@ export default function EditMarks() {
         }
     };
 
+
     const handleInputChange = async (studentId, field, value) => {
+        // teacher_id = await AsyncStorage.getItem('teacher-id');
+
         if (value > 100) {
             alert('Marks cannot be greater than 30');
             return;
@@ -68,12 +85,16 @@ export default function EditMarks() {
             [studentId]: {
                 ...prevMarks[studentId],
                 [field]: value,
+                teacherId: teacher_id,
             },
         }));
 
         try {
-            const rs = await axios.put(`https://sjsc-backend-production.up.railway.app/api/v1/marks/update-marks/${markId}`, {
+            const rs = await axios.put(
+                `https://sjsc-backend-production.up.railway.app/api/v1/marks/update-marks/${markId}`, {
+                // `http://192.168.0.108:3000/api/v1/marks/update-marks/${markId}`, {
                 studentId: studentId,
+                teacherId: teacher_id,
                 [field]: value,
             });
             if (rs.data.status == "success") {
@@ -83,8 +104,10 @@ export default function EditMarks() {
             }
 
         } catch (e) {
-            console.log(e);
-            alert("Error updating marks, Please Contact Admin");
+            // log the error to console
+            console.log(e.response.data.error);
+
+            alert(`${e.response.data.error}`);
         }
     };
 
@@ -120,6 +143,19 @@ export default function EditMarks() {
         );
     }
 
+    const searchByRollOrName = (text) => {
+        const lowerText = text.toLowerCase();
+        if (!lowerText) {
+            setFilteredData(data);
+            return;
+        }
+        const filtered = data.filter(item =>
+            item?.Student?.roll.toString().toLowerCase().includes(lowerText) ||
+            item?.Student?.name.toLowerCase().includes(lowerText)
+        );
+        setFilteredData(filtered);
+    };
+
     return (
 
         <KeyboardAvoidingView
@@ -138,71 +174,100 @@ export default function EditMarks() {
                     }}>
                         {examName} ({className} {groupName || ""} - {sectionName || ""}) {shift ? `(${shift})` : ""}
                     </Text>
-                    {data.map(item => (
-                        <View key={item.Student.id} style={styles.studentCard}>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                gap: 10,
-                                marginBottom: 10,
-                            }}>
-                                <Text style={styles.studentRoll}>{item?.Student?.roll} - {item?.Student?.name}</Text>
-                                {quiz && (
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Quiz"
-                                        keyboardType="numeric"
-                                        value={String(marks[item.Student?.id]?.quiz || '')}
-                                        onChangeText={text => handleInputChange(item.Student?.id, 'quiz', text)}
-                                        ref={setInputRef(item.id, 'quiz')}
-                                        onSubmitEditing={() => focusNextInput(item.id, 'quiz')}
-                                    />
-                                )}
-                            </View>
-                            <View style={styles.marksRow}>
-                                {mcq && (
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="MCQ"
-                                        keyboardType="numeric"
-                                        value={String(marks[item.Student.id]?.mcq)}
-                                        onChangeText={text => handleInputChange(item.Student.id, 'mcq', text)}
-                                        ref={setInputRef(item.id, 'mcq')}
-                                        onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
-                                    />
-                                )}
-                                {written && (
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Written"
-                                        keyboardType="numeric"
-                                        value={String(marks[item.Student.id].written)}
-                                        onChangeText={text => handleInputChange(item.Student.id, 'written', text)}
-                                        ref={setInputRef(item.id, 'written')}
-                                        onSubmitEditing={() => focusNextInput(item.id, 'written')}
-                                    />
-                                )}
-                                {practical && (
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Practical"
-                                        keyboardType="numeric"
-                                        value={String(marks[item.Student.id]?.practical)}
-                                        onChangeText={text => handleInputChange(item.Student.id, 'practical', text)}
-                                        ref={setInputRef(item.id, 'practical')}
-                                        onSubmitEditing={() => focusNextInput(item.id, 'practical')}
-                                    />
-                                )}
+                    {/* Add a Search bar */}
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Search by roll or name"
+                        onChangeText={(e) => searchByRollOrName(e)}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
 
-                            </View>
-                        </View>
-                    ))}
+                    {filteredData.map(item => {
+                        const disabled = !(marks[item.Student.id]?.teacherId && marks[item.Student.id]?.teacherId != teacher_id);
 
-                    {/* <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={processing}>
-                {processing ? <ActivityIndicator color="white" /> : null}
-                <Text style={styles.submitButtonText}>Submit Marks</Text>
-            </TouchableOpacity> */}
+                        return (
+                            <View key={item.Student.id} style={styles.studentCard}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    gap: 10,
+                                    marginBottom: 10,
+                                }}>
+                                    <Text style={styles.studentRoll}>
+                                        {item?.Student?.roll} - {item?.Student?.name}
+                                    </Text>
+
+                                    {quiz && (
+                                        <TextInput
+                                            style={[
+                                                styles.input,
+                                                !disabled && styles.disabledInput // Apply disabled style
+                                            ]}
+                                            placeholder="Quiz"
+                                            keyboardType="numeric"
+                                            value={String(marks[item.Student?.id]?.quiz || '')}
+                                            onChangeText={text => handleInputChange(item.Student?.id, 'quiz', text)}
+                                            ref={setInputRef(item.id, 'quiz')}
+                                            onSubmitEditing={() => focusNextInput(item.id, 'quiz')}
+                                            editable={disabled}
+                                        />
+                                    )}
+                                </View>
+
+                                <View style={styles.marksRow}>
+                                    {mcq && (
+                                        <TextInput
+                                            style={[
+                                                styles.input,
+                                                !disabled && styles.disabledInput
+                                            ]}
+                                            placeholder="MCQ"
+                                            keyboardType="numeric"
+                                            value={String(marks[item.Student.id]?.mcq || '')}
+                                            onChangeText={text => handleInputChange(item.Student.id, 'mcq', text)}
+                                            ref={setInputRef(item.id, 'mcq')}
+                                            onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
+                                            editable={disabled}
+                                        />
+                                    )}
+
+                                    {written && (
+                                        <TextInput
+                                            style={[
+                                                styles.input,
+                                                !disabled && styles.disabledInput
+                                            ]}
+                                            placeholder="Written"
+                                            keyboardType="numeric"
+                                            value={String(marks[item.Student.id]?.written || '')}
+                                            onChangeText={text => handleInputChange(item.Student.id, 'written', text)}
+                                            ref={setInputRef(item.id, 'written')}
+                                            onSubmitEditing={() => focusNextInput(item.id, 'written')}
+                                            editable={disabled}
+                                        />
+                                    )}
+
+                                    {practical && (
+                                        <TextInput
+                                            style={[
+                                                styles.input,
+                                                !disabled && styles.disabledInput
+                                            ]}
+                                            placeholder="Practical"
+                                            keyboardType="numeric"
+                                            value={String(marks[item.Student.id]?.practical || '')}
+                                            onChangeText={text => handleInputChange(item.Student.id, 'practical', text)}
+                                            ref={setInputRef(item.id, 'practical')}
+                                            onSubmitEditing={() => focusNextInput(item.id, 'practical')}
+                                            editable={disabled}
+                                        />
+                                    )}
+                                </View>
+                            </View>
+                        );
+                    })}
                 </View>
 
             </ScrollView>
@@ -249,6 +314,11 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderRadius: 5,
         textAlign: 'center',
+    },
+    disabledInput: {
+        backgroundColor: '#f0f0f0',
+        borderColor: '#ccc',
+        color: '#999',
     },
     submitButton: {
         padding: 15,

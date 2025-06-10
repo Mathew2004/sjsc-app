@@ -14,13 +14,26 @@ export default function TakeMarks() {
     console.log('TakeMarks', route.params);
 
     const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [marks, setMarks] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [teacher_id, setTeacherId] = useState(null);
 
     useEffect(() => {
+        fetchTeacherId();
         fetchStudents();
     }, []);
+
+    async function fetchTeacherId() {
+        try {
+            const teacher_id = await AsyncStorage.getItem('teacher-id');
+            setTeacherId(teacher_id);
+        }
+        catch (error) {
+            console.error('Error fetching teacher ID:', error);
+        }
+    }
 
     const fetchStudents = async () => {
         try {
@@ -29,6 +42,7 @@ export default function TakeMarks() {
                 `https://sjsc-backend-production.up.railway.app/api/v1/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`
             );
             setData(res.data);
+            setFilteredData(res.data);
         } catch (error) {
             console.error('Error fetching students:', error);
         } finally {
@@ -46,6 +60,7 @@ export default function TakeMarks() {
             [studentId]: {
                 ...prevMarks[studentId],
                 [field]: value,
+                teacherId: teacher_id,
             },
         }));
     };
@@ -60,14 +75,16 @@ export default function TakeMarks() {
                 written: marks[student.id]?.written || null,
                 practical: marks[student.id]?.practical || null,
                 quiz: marks[student.id]?.quiz || null,
+                teacherId: marks[student.id]?.teacherId || null,
             }));
 
             const response = await axios.post(
                 `https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks`,
-                // 'https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks',
+                // `http://192.168.0.108:3000/api/v1/marks/take-marks`,
                 {
                     marksId: markId,
                     records: studentRecords,
+
                 },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -118,6 +135,20 @@ export default function TakeMarks() {
         );
     }
 
+    const searchByRollOrName = (text) => {
+        const lowerText = text.toLowerCase();
+        if (!lowerText) {
+            setFilteredData(data);
+            return;
+        }
+        const filtered = data.filter(item =>
+            item?.roll.toString().toLowerCase().includes(lowerText) ||
+            item?.name.toLowerCase().includes(lowerText)
+        );
+        setFilteredData(filtered);
+    };
+
+
     return (
 
         <View style={styles.container}>
@@ -131,9 +162,25 @@ export default function TakeMarks() {
             }}>
                 {examName}
             </Text>
+            {/* Add a Search bar */}
+            <View>
+                <TextInput
+                    style={{
+                        borderWidth: 1,
+                        borderColor: '#ddd',
+                        borderRadius: 5,
+                        padding: 10,
+                        marginBottom: 20,
+                    }}
+                    placeholder="Search by roll or name"
+                    onChangeText={(e) => searchByRollOrName(e)}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
+            </View>
             <ScrollView contentContainerStyle={styles.scrollView}>
 
-                {data.map((item, index) => (
+                {filteredData.map((item, index) => (
                     <View key={item.id} style={styles.studentCard}>
                         <View style={{
                             flexDirection: 'row',
