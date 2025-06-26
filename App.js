@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
@@ -55,6 +55,22 @@ export default function App() {
     };
 
     checkLoginStatus();
+    requestUserPermission();
+
+    messaging()
+      .getToken()
+      .then(token => {
+        console.log('FCM Token:', token);
+      });
+
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      const { notification } = remoteMessage;
+      if (notification) {
+        Alert.alert(notification.title || 'New Message', notification.body || '');
+      }
+    });
+
+    return unsubscribe;
   }, []);
 
   if (loading) {
