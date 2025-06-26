@@ -1,9 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from './screens/HomeScreen';
 import Dashboard from './screens/Dashboard';
 import Header from './components/Header';
@@ -23,7 +20,7 @@ import MarksLists from './screens/MarksList';
 
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+
 
 export default function App() {
   // Get AsyncStorage
@@ -46,76 +43,6 @@ export default function App() {
 
     checkLoginStatus();
   }, []);
-
-  const MainTabs = () => (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
-          if (route.name === 'Home') {
-            iconName = 'home';
-          } else if (route.name === 'Attendance') {
-            iconName = 'calendar';
-          } else if (route.name === 'Marks') {
-            iconName = 'clipboard';
-          } else if (route.name === 'Profile') {
-            iconName = 'person';
-          }
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#6C63FF',
-        tabBarInactiveTintColor: 'gray',
-      })}
-    >
-      <Tab.Screen
-        name="Home"
-        options={{ header: () => <Header /> }}
-      >
-        {props => (
-          <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-              <HomeScreen {...props} setValue={setValue} />
-            </ScrollView>
-          </SafeAreaView>
-        )}
-      </Tab.Screen>
-      <Tab.Screen
-        name="Attendance"
-        component={Attendance}
-        options={{
-          title: 'Attendance',
-          headerStyle: { backgroundColor: '#eee' },
-          headerTintColor: '#111',
-          headerTextAlign: 'center',
-        }}
-      />
-      <Tab.Screen
-        name="Marks"
-        component={Marks}
-        options={{
-          title: 'Marks',
-          headerStyle: { backgroundColor: '#eee' },
-          headerTintColor: '#111',
-          headerTextAlign: 'center',
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        options={{
-          title: 'Profile',
-          headerStyle: { backgroundColor: '#eee' },
-          headerTintColor: '#111',
-          headerTextAlign: 'center',
-        }}
-      >
-        {props => (
-          <SafeAreaView style={{ flex: 1 }}>
-            <Profile setValue={setValue} />
-          </SafeAreaView>
-        )}
-      </Tab.Screen>
-    </Tab.Navigator>
-  );
 
   if (loading) {
     return (
@@ -150,16 +77,47 @@ export default function App() {
           ) : (
             <>
               <Stack.Screen
-                name="Main"
-                options={{ headerShown: false }}
+                name="Home"
+                options={{
+                  header: () => <Header />,
+                }}
               >
-                {() => <MainTabs />}
+                {(props) => (
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                      <HomeScreen {...props} setValue={setValue} />
+                    </ScrollView>
+                  </SafeAreaView>
+                )}
               </Stack.Screen>
+
+              <Stack.Screen
+                name="Attendance"
+                component={Attendance}
+                options={{
+                  title: 'Attendance',
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
+                }}
+              />
               <Stack.Screen
                 name="TakeAttendance"
                 component={TakeAttendance}
                 options={{
                   title: 'Attendance',
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
+                }}
+              />
+              <Stack.Screen
+                name="Marks"
+                component={Marks}
+                options={{
+                  title: 'Marks',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
                   headerTextAlign: 'center',
@@ -233,7 +191,32 @@ export default function App() {
                   detachPreviousScreen: false,
                 }}
               />
-              {/* Profile screen handled in bottom tabs */}
+              {/* <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{
+                  title: 'Profile',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              /> */}
+              <Stack.Screen
+                name="Profile"
+                options={{
+                  title: 'Profile',
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
+                  headerTextAlign: 'center'
+                }}
+              >
+                {(props) => (
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <Profile setValue={setValue} />
+                  </SafeAreaView>
+                )}
+              </Stack.Screen>
             </>
           )
         }
