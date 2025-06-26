@@ -18,6 +18,8 @@ import Profile from './screens/Profile';
 import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
+import messaging from '@react-native-firebase/messaging';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -27,6 +29,18 @@ export default function App() {
   const [value, setValue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+  }
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -144,7 +158,7 @@ export default function App() {
                   headerTextAlign: 'center',
                   detachPreviousScreen: false,
                 }}
-                
+
               />
               <Stack.Screen
                 name="ViewAttendance"

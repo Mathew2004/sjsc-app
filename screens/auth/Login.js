@@ -73,8 +73,8 @@ const LoginScreen = ({ setValue }) => {
     };
     return (
         <View style={styles.container}>
-            <Image source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }} style={styles.logo} />
-            <Text style={styles.schoolName}>St. Joseph's School and College, Bonpara, Natore</Text>
+            <Image source={{ uri: "https://assets.chorcha.net/a-SYEMAoDS7aZhSPshmh6.png" }} style={styles.logo} />
+            <Text style={styles.schoolName}>SJSC Teacher's App</Text>
             <Text style={styles.signInText}>Sign in</Text>
             {error &&
                 <Text style={{

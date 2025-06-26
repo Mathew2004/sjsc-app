@@ -12,12 +12,12 @@ const Header = () => {
             {/* Center Image */}
             <View style={styles.centerView}>
                 <Image
-                    source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }}
+                    source={{ uri: "https://assets.chorcha.net/a-SYEMAoDS7aZhSPshmh6.png" }}
                     style={styles.centerImage}
                 />
                 <View>
-                    <Text style={styles.headerTextBold}>St. Joseph's School & College</Text>
-                    <Text>Bonpara, Natore</Text>
+                    <Text style={styles.headerTextBold}>SJSC Teachers App</Text>
+                    {/* <Text>Bonpara, Natore</Text> */}
                 </View>
             </View>
 
