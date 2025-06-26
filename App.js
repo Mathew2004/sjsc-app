@@ -18,8 +18,6 @@ import Profile from './screens/Profile';
 import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
-// import messaging from '@react-native-firebase/messaging';
-
 
 
 const Stack = createNativeStackNavigator();
@@ -30,39 +28,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
-  async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-    }
-  }
-
-  const getToken = async () => {
-    const token = await messaging().getToken();
-    if (token) {
-      console.log('Device FCM Token:', token);
-      // You can send this token to your server or save it in AsyncStorage
-      await AsyncStorage.setItem('fcmToken', token);
-    } else {
-      console.log('No FCM token received');
-    }
-  };
-
-  // useEffect(() => {
-  //   requestUserPermission();
-  //   getToken();
-  //   // const unsubscribe = messaging().onMessage(async remoteMessage => {
-  //   //   console.log('A new FCM message arrived!', remoteMessage);
-  //   //   // Handle the message here, e.g., show a notification
-  //   // });
-  //   // // Clean up the listener on unmount
-  //   // return unsubscribe;
-  // }, []);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -77,22 +42,6 @@ export default function App() {
     };
 
     checkLoginStatus();
-    requestUserPermission();
-
-    messaging()
-      .getToken()
-      .then(token => {
-        console.log('FCM Token:', token);
-      });
-
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      const { notification } = remoteMessage;
-      if (notification) {
-        Alert.alert(notification.title || 'New Message', notification.body || '');
-      }
-    });
-
-    return unsubscribe;
   }, []);
 
   if (loading) {
