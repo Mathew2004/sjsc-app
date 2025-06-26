@@ -18,7 +18,7 @@ import Profile from './screens/Profile';
 import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
 
 
 
@@ -41,6 +41,28 @@ export default function App() {
       console.log('Authorization status:', authStatus);
     }
   }
+
+  const getToken = async () => {
+    const token = await messaging().getToken();
+    if (token) {
+      console.log('Device FCM Token:', token);
+      // You can send this token to your server or save it in AsyncStorage
+      await AsyncStorage.setItem('fcmToken', token);
+    } else {
+      console.log('No FCM token received');
+    }
+  };
+
+  // useEffect(() => {
+  //   requestUserPermission();
+  //   getToken();
+  //   // const unsubscribe = messaging().onMessage(async remoteMessage => {
+  //   //   console.log('A new FCM message arrived!', remoteMessage);
+  //   //   // Handle the message here, e.g., show a notification
+  //   // });
+  //   // // Clean up the listener on unmount
+  //   // return unsubscribe;
+  // }, []);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
