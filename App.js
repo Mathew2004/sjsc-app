@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator, Alert, StatusBar } from 'react-native';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
@@ -52,14 +52,13 @@ export default function App() {
     );
   }
 
-
-
-
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {
-          value === null ? (
+    <>
+     <StatusBar barStyle="dark-content" backgroundColor="#667eea" />
+      <NavigationContainer>
+        <Stack.Navigator>
+          {
+            value === null ? (
             <Stack.Screen
               name="Login"
               options={{
@@ -222,6 +221,7 @@ export default function App() {
         }
       </Stack.Navigator>
     </NavigationContainer>
+    </>
   );
 }
 

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, ScrollView, Animated } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
@@ -7,13 +7,18 @@ import { useNavigation } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from '@expo/vector-icons';
 
 const AttendanceReport = () => {
   const navigation = useNavigation();
 
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [classItems, setClassItems] = useState([]);
 
   // Date filter state
@@ -21,6 +26,38 @@ const AttendanceReport = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+
+  // Animation setup
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Pulse animation loop
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.02,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const fetchAttendanceData = async () => {
     setLoading(true);
@@ -100,29 +137,76 @@ const AttendanceReport = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={styles.loadingContainer}>
+        <Animated.View style={[styles.loadingCard, { opacity: fadeAnim }]}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading Reports...</Text>
+          <View style={styles.loadingDots}>
+            <Animated.View style={[styles.dot, { opacity: pulseAnim }]} />
+            <Animated.View style={[styles.dot, { opacity: pulseAnim }]} />
+            <Animated.View style={[styles.dot, { opacity: pulseAnim }]} />
+          </View>
+        </Animated.View>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Attendance Reports</Text>
+      {/* Header Section */}
+      {/* <Animated.View style={[
+        styles.headerSection,
+       
+      ]}>
+        <View style={styles.headerIconContainer}>
+          <Ionicons name="calendar-outline" size={28} color="#007AFF" />
+        </View>
+        <Text style={styles.headerTitle}>Attendance Reports</Text>
+        <Text style={styles.headerSubtitle}>View and manage attendance records</Text>
+      </Animated.View> */}
 
-      {/* Filter Section */}
-      <View style={styles.filterContainer}>
-        {/* <Text style={styles.filterText}>Filter by Date:</Text>  */}
-        <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
-          <Text style={styles.dateText}>{dayjs(startDate).format("D MMMM YYYY")}</Text>
-        </TouchableOpacity>
-        <Text style={{
-          fontSize: 16,
-          fontWeight: "bold",
-          marginHorizontal: 5,
-          color: "#333",
-        }}> To </Text>
-        <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
-          <Text style={styles.dateText}>{dayjs(endDate).format("D MMMM YYYY")}</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Date Filter Section */}
+      <Animated.View style={[
+        styles.filterSection,
+       
+      ]}>
+        <View style={styles.filterHeader}>
+          <Ionicons name="filter" size={18} color="#007AFF" />
+          <Text style={styles.filterTitle}>Filter by Date Range</Text>
+        </View>
+        
+        <View style={styles.dateRangeContainer}>
+          <TouchableOpacity 
+            style={styles.dateButton}
+            onPress={() => setShowStartDatePicker(true)}
+          >
+            <View style={styles.dateButtonContent}>
+              <Ionicons name="calendar" size={16} color="#007AFF" />
+              <Text style={styles.dateButtonText}>
+                {dayjs(startDate).format("D MMM YYYY")}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          
+          <View style={styles.dateRangeSeparator}>
+            <Text style={styles.dateRangeText}>to</Text>
+            <View style={styles.dateRangeLine} />
+          </View>
+          
+          <TouchableOpacity 
+            style={styles.dateButton}
+            onPress={() => setShowEndDatePicker(true)}
+          >
+            <View style={styles.dateButtonContent}>
+              <Ionicons name="calendar" size={16} color="#007AFF" />
+              <Text style={styles.dateButtonText}>
+                {dayjs(endDate).format("D MMM YYYY")}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
 
       {/* Show Date Pickers if needed */}
       {showStartDatePicker && (
@@ -142,72 +226,113 @@ const AttendanceReport = () => {
         />
       )}
 
-      <ScrollView contentContainerStyle={{ padding: 2 }}>
+      {/* Statistics */}
+      {/* <Animated.View style={[
+        styles.statsSection,
+       
+      ]}>
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{filterAttendanceData().length}</Text>
+            <Text style={styles.statLabel}>Total Records</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statNumber, { color: '#34C759' }]}>
+              {filterAttendanceData().filter(item => item.isTaken).length}
+            </Text>
+            <Text style={styles.statLabel}>Completed</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statNumber, { color: '#FF3B30' }]}>
+              {filterAttendanceData().filter(item => !item.isTaken).length}
+            </Text>
+            <Text style={styles.statLabel}>Pending</Text>
+          </View>
+        </View>
+      </Animated.View> */}
+
+      {/* Attendance Records List */}
+      <ScrollView 
+        style={styles.recordsList}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.recordsContainer}
+      >
         {filterAttendanceData().length > 0 ? (
           filterAttendanceData().map((item, index) => (
-            <View
+            <Animated.View
               key={`${item.id}-${index}`}
-              style={{
-                flexDirection: "row",
-                backgroundColor: "#f9f9f9",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                marginVertical: 4,
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: "#e0e0e0",
-              }}
+              style={[
+                styles.recordCard,
+                item.isTaken ? styles.completedCard : styles.pendingCard,
+              ]}
             >
-              {/* Date Column */}
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.cell, { flex: 1 }]}>
-                  {dayjs(item.date).format("D MMMM")}
-                </Text>
-                <Text
-                  style={{
-                    color: item.isTaken ? "green" : "red",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {item.isTaken ? "Taken" : "Not Taken"}
-                </Text>
-              </View>
+              {/* Status Indicator */}
+              <View style={[
+                styles.statusIndicator,
+                item.isTaken ? styles.completedIndicator : styles.pendingIndicator
+              ]} />
 
-              {/* Class, Group, and Section Column */}
-              <View style={{ flex: 2, marginLeft: 16 }}>
-                <Text style={styles.cell}>{item?.Class?.name}</Text>
-                <Text style={styles.cell}>
-                  {item?.Group?.name || "N/A"} ({item?.Section?.name || "N/A"})
-                </Text>
-              </View>
+              {/* Record Content */}
+              <View style={styles.recordContent}>
+                {/* Date Section */}
+                <View style={styles.dateSection}>
+                  <Text style={styles.recordDate}>
+                    {dayjs(item.date).format("D")}
+                  </Text>
+                  <Text style={styles.recordMonth}>
+                    {dayjs(item.date).format("MMM")}
+                  </Text>
+                </View>
 
-              {/* Status Column */}
-              <TouchableOpacity
-                onPress={() =>
-                  item.isTaken ? handleButtonPress(item.id) : handleTakeAttendance(item)
-                }
-                style={{ flex: 1, alignItems: "flex-end" }}
-              >
-                <Text
-                  style={{
-                    ...styles.cell,
-                    color: item.isTaken ? "green" : "red",
-                    fontWeight: "bold",
-                  }}
+                {/* Class Info Section */}
+                <View style={styles.classInfoSection}>
+                  <Text style={styles.className}>{item?.Class?.name}</Text>
+                  <Text style={styles.classDetails}>
+                    {item?.Group?.name || "All Groups"} • {item?.Section?.name || "All Sections"}
+                  </Text>
+                  <View style={styles.statusBadge}>
+                    <View style={[
+                      styles.statusDot,
+                      item.isTaken ? styles.completedDot : styles.pendingDot
+                    ]} />
+                    <Text style={[
+                      styles.statusText,
+                      item.isTaken ? styles.completedText : styles.pendingText
+                    ]}>
+                      {item.isTaken ? "Completed" : "Pending"}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Action Section */}
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() =>
+                    item.isTaken ? handleButtonPress(item.id) : handleTakeAttendance(item)
+                  }
                 >
-                  {item.isTaken ? (
-                    <Icon name="eye" type="feather" size={18} color="#007bff" />
-                  ) : (
-                    "✏️"
-                  )}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <View style={[
+                    styles.actionButtonContent,
+                    item.isTaken ? styles.viewAction : styles.takeAction
+                  ]}>
+                    <Ionicons 
+                      name={item.isTaken ? "eye" : "create"} 
+                      size={18} 
+                      color="white" 
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
           ))
         ) : (
-          <Text style={{ textAlign: "center", marginTop: 20 }}>No attendance data available.</Text>
+          <Animated.View style={[styles.emptyState, { opacity: fadeAnim }]}>
+            <Ionicons name="document-outline" size={48} color="#8E8E93" />
+            <Text style={styles.emptyStateText}>No attendance records found</Text>
+            <Text style={styles.emptyStateSubtext}>
+              Try adjusting your date filter range
+            </Text>
+          </Animated.View>
         )}
       </ScrollView>
     </View>
@@ -217,37 +342,331 @@ const AttendanceReport = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#F8F9FA',
   },
-  header: {
-    fontSize: 20,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+  },
+  loadingCard: {
+    backgroundColor: 'white',
+    padding: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  loadingDots: {
+    flexDirection: 'row',
+    marginTop: 15,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#007AFF',
+    marginHorizontal: 3,
+  },
+  headerSection: {
+    backgroundColor: 'white',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  headerIconContainer: {
+    backgroundColor: '#F0F8FF',
+    padding: 15,
+    borderRadius: 25,
+    marginBottom: 15,
+  },
+  headerTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#1C1C1E',
+    marginBottom: 5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  filterSection: {
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  filterHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  filterTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1C1C1E',
+    marginLeft: 8,
+  },
+  dateRangeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dateButton: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    flex: 1,
+  },
+  dateButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dateButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#007AFF',
+    marginLeft: 6,
+  },
+  dateRangeSeparator: {
+    alignItems: 'center',
+    marginHorizontal: 12,
+  },
+  dateRangeText: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  dateRangeLine: {
+    width: 20,
+    height: 2,
+    backgroundColor: '#E5E5EA',
+    borderRadius: 1,
+  },
+  statsSection: {
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statCard: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '500',
     textAlign: 'center',
   },
-  filterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  filterText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginRight: 10,
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#007bff",
-    borderWidth: 1,
-    borderColor: "#999",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-    fontWeight: "bold",
-  },
-  cell: {
+  recordsList: {
     flex: 1,
+    marginTop: 16,
+  },
+  recordsContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  recordCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  completedCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#34C759',
+  },
+  pendingCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF3B30',
+  },
+  statusIndicator: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 4,
+    height: '100%',
+  },
+  completedIndicator: {
+    backgroundColor: '#34C759',
+  },
+  pendingIndicator: {
+    backgroundColor: '#FF3B30',
+  },
+  recordContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    paddingLeft: 20,
+  },
+  dateSection: {
+    alignItems: 'center',
+    marginRight: 16,
+    minWidth: 50,
+  },
+  recordDate: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1C1C1E',
+    lineHeight: 24,
+  },
+  recordMonth: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '500',
+    textTransform: 'uppercase',
+  },
+  classInfoSection: {
+    flex: 1,
+    marginRight: 12,
+  },
+  className: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1C1C1E',
+    marginBottom: 4,
+  },
+  classDetails: {
+    fontSize: 14,
+    color: '#8E8E93',
+    marginBottom: 8,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  completedDot: {
+    backgroundColor: '#34C759',
+  },
+  pendingDot: {
+    backgroundColor: '#FF3B30',
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  completedText: {
+    color: '#34C759',
+  },
+  pendingText: {
+    color: '#FF3B30',
+  },
+  actionButton: {
+    paddingLeft: 12,
+  },
+  actionButtonContent: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  viewAction: {
+    backgroundColor: '#007AFF',
+  },
+  takeAction: {
+    backgroundColor: '#FF9500',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#8E8E93',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: '#8E8E93',
     textAlign: 'center',
   },
 });
