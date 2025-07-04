@@ -242,10 +242,7 @@ export default function TeacherScreen() {
                     <Text style={styles.loadingText}>Loading teachers...</Text>
                 </View>
             ) : (
-                <FlatList
-                    data={filteredTeachers}
-                    keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-                    renderItem={({ item, index }) => <TeacherCard teacher={item} index={index} />}
+                <ScrollView
                     contentContainerStyle={styles.listContainer}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
@@ -259,8 +256,19 @@ export default function TeacherScreen() {
                             tintColor="#6366f1"
                         />
                     }
-                    ListEmptyComponent={renderEmptyState}
-                />
+                >
+                    {filteredTeachers.length === 0 ? (
+                        renderEmptyState()
+                    ) : (
+                        filteredTeachers.map((teacher, index) => (
+                            <TeacherCard 
+                                key={teacher.id?.toString() || Math.random().toString()} 
+                                teacher={teacher} 
+                                index={index} 
+                            />
+                        ))
+                    )}
+                </ScrollView>
             )}
         </View>
     );

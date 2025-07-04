@@ -226,30 +226,6 @@ const AttendanceReport = () => {
         />
       )}
 
-      {/* Statistics */}
-      {/* <Animated.View style={[
-        styles.statsSection,
-       
-      ]}>
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{filterAttendanceData().length}</Text>
-            <Text style={styles.statLabel}>Total Records</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={[styles.statNumber, { color: '#34C759' }]}>
-              {filterAttendanceData().filter(item => item.isTaken).length}
-            </Text>
-            <Text style={styles.statLabel}>Completed</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={[styles.statNumber, { color: '#FF3B30' }]}>
-              {filterAttendanceData().filter(item => !item.isTaken).length}
-            </Text>
-            <Text style={styles.statLabel}>Pending</Text>
-          </View>
-        </View>
-      </Animated.View> */}
 
       {/* Attendance Records List */}
       <ScrollView 

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Animated, Dimensions, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Animated, Dimensions, ActivityIndicator, Image, Modal } from "react-native";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from '@expo/vector-icons';
+// import * as ImagePicker from 'expo-image-picker';
 
 const UpdateProfileForm = ({ setValue }) => {
     const navigation = useNavigation();
@@ -21,6 +22,8 @@ const UpdateProfileForm = ({ setValue }) => {
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    // const [profileImage, setProfileImage] = useState(null);
+    // const [imageLoading, setImageLoading] = useState(false);
 
     // Animation setup
     useEffect(() => {
@@ -54,22 +57,6 @@ const UpdateProfileForm = ({ setValue }) => {
         ).start();
     }, []);
 
-    // const [dept, setDept] = useState("");
-
-    // const [image, setImage] = useState(null);
-    // const [file, setFile] = useState(null);
-
-    // const [positionItems, setPositionItems] = useState([
-    //     { label: "Lecturer", value: "Lecturer" },
-    //     { label: "Assistant Professor", value: "Assistant Professor" },
-    //     { label: "Professor", value: "Professor" }
-    // ]);
-    // const [positionValue, setPositionValue] = useState(null);
-    // const [openPosition, setOpenPosition] = useState(false);
-
-    // const [imageUri, setImageUri] = useState(null);
-
-
 
     const getTeacher = async () => {
         try {
@@ -85,10 +72,12 @@ const UpdateProfileForm = ({ setValue }) => {
 
             if (response.status === 200) {
                 const { name, email, phone, password } = response.data.teacher;
+                // const { name, email, phone, password, profileImage } = response.data.teacher;
                 setName(name);
                 setEmail(email);
                 setPhone(phone);
                 setPassword(password);
+                // setProfileImage(profileImage || null);
                 // setDept(extra?.dept || "");
                 // setPositionValue(extra?.position || "");
             }
@@ -117,6 +106,7 @@ const UpdateProfileForm = ({ setValue }) => {
             email,
             phone,
             password,
+            // profileImage,
             // dept,
             // position: positionValue,
         };
@@ -151,34 +141,149 @@ const UpdateProfileForm = ({ setValue }) => {
 
     const [permissionStatus, setPermissionStatus] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    // const [showPermissionModal, setShowPermissionModal] = useState(false);
 
     // Requesting permissions
-    useEffect(() => {
-        const requestPermission = async () => {
-            // Commented out for now - ImagePicker functionality
-            // const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            // setPermissionStatus(status === 'granted');
-        };
-        requestPermission();
-    }, []);
+    // useEffect(() => {
+    //     const checkPermission = async () => {
+    //         console.log("Checking media library permissions...");
+    //         const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
+    //         setPermissionStatus(status === 'granted');
+    //         console.log("Current permission status:", status);
+    //     };
+    //     checkPermission();
+    // }, []);
 
-    const pickImage = async () => {
-        // Commented out for now - ImagePicker functionality
-        // if (permissionStatus === 'granted') {
-        //     let result = await ImagePicker.launchImageLibraryAsync({
-        //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        //         allowsEditing: true,
-        //         aspect: [4, 3],
-        //         quality: 1,
-        //     });
+    // const requestPermissions = async () => {
+    //     try {
+    //         console.log("Requesting media library permissions...");
+    //         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    //         setPermissionStatus(status === 'granted');
+    //         console.log("Media library permission status:", status);
+            
+    //         if (status === 'granted') {
+    //             setShowPermissionModal(false);
+    //             return true;
+    //         } else {
+    //             Alert.alert(
+    //                 "Permission Denied",
+    //                 "Camera roll permission is required to upload photos. Please enable it in your device settings.",
+    //                 [{ text: "OK" }]
+    //             );
+    //             return false;
+    //         }
+    //     } catch (error) {
+    //         console.error('Error requesting permissions:', error);
+    //         return false;
+    //     }
+    // };
 
-        //     if (!result.cancelled) {
-        //         setImage(result.uri);
-        //     }
-        // } else {
-        //     alert("Permission to access media library is required.");
-        // }
-    };
+    // const pickImage = async () => {
+    //     if (permissionStatus !== true) {
+    //         const granted = await requestPermissions();
+    //         if (!granted) return;
+    //     }
+        
+    //     try {
+    //         setImageLoading(true);
+    //         let result = await ImagePicker.launchImageLibraryAsync({
+    //             mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //             allowsEditing: true,
+    //             aspect: [1, 1],
+    //             quality: 0.8,
+    //         });
+
+    //         if (!result.canceled && result.assets[0]) {
+    //             // Convert image to base64 for easy storage/upload
+    //             const response = await fetch(result.assets[0].uri);
+    //             const blob = await response.blob();
+    //             const reader = new FileReader();
+    //             reader.onload = () => {
+    //                 setProfileImage(reader.result);
+    //             };
+    //             reader.readAsDataURL(blob);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error picking image:', error);
+    //         Alert.alert('Error', 'Failed to pick image. Please try again.');
+    //     } finally {
+    //         setImageLoading(false);
+    //     }
+    // };
+
+    // const takePhoto = async () => {
+    //     try {
+    //         console.log("Requesting camera permissions...");
+    //         const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    //         console.log("Camera permission status:", status);
+            
+    //         if (status === 'granted') {
+    //             try {
+    //                 setImageLoading(true);
+    //                 let result = await ImagePicker.launchCameraAsync({
+    //                     allowsEditing: true,
+    //                     aspect: [1, 1],
+    //                     quality: 0.8,
+    //                 });
+
+    //                 if (!result.canceled && result.assets[0]) {
+    //                     // Convert image to base64 for easy storage/upload
+    //                     const response = await fetch(result.assets[0].uri);
+    //                     const blob = await response.blob();
+    //                     const reader = new FileReader();
+    //                     reader.onload = () => {
+    //                         setProfileImage(reader.result);
+    //                     };
+    //                     reader.readAsDataURL(blob);
+    //                 }
+    //             } catch (error) {
+    //                 console.error('Error taking photo:', error);
+    //                 Alert.alert('Error', 'Failed to take photo. Please try again.');
+    //             } finally {
+    //                 setImageLoading(false);
+    //             }
+    //         } else {
+    //             Alert.alert(
+    //                 "Permission Denied", 
+    //                 "Camera permission is required to take photos. Please enable it in your device settings.",
+    //                 [{ text: "OK" }]
+    //             );
+    //         }
+    //     } catch (error) {
+    //         console.error('Error requesting camera permission:', error);
+    //         Alert.alert('Error', 'Failed to request camera permission.');
+    //     }
+    // };
+
+    // const showImageOptions = () => {
+    //     // Check if we need to request permissions
+    //     if (permissionStatus !== true) {
+    //         setShowPermissionModal(true);
+    //         return;
+    //     }
+
+    //     const options = [
+    //         { text: "Camera", onPress: takePhoto },
+    //         { text: "Gallery", onPress: pickImage },
+    //     ];
+
+    //     // Add remove option if image exists
+    //     if (profileImage) {
+    //         options.push({ 
+    //             text: "Remove Photo", 
+    //             onPress: () => setProfileImage(null),
+    //             style: "destructive"
+    //         });
+    //     }
+
+    //     options.push({ text: "Cancel", style: "cancel" });
+
+    //     Alert.alert(
+    //         "Profile Photo",
+    //         "Choose an option",
+    //         options
+    //     );
+    // };
 
     // Loading component
     if (loading) {
@@ -222,6 +327,48 @@ const UpdateProfileForm = ({ setValue }) => {
                 <Animated.View style={[
                     styles.headerSection,
                 ]}>
+                    {/* Profile Photo Section */}
+                    {/* <View style={styles.profilePhotoContainer}>
+                        <TouchableOpacity 
+                            style={styles.profilePhotoWrapper}
+                            onPress={showImageOptions}
+                            disabled={imageLoading}
+                            activeOpacity={0.8}
+                        >
+                            <View style={styles.profilePhotoGlow} />
+                            {profileImage ? (
+                                <Image 
+                                    source={{ uri: profileImage }} 
+                                    style={styles.profilePhoto}
+                                />
+                            ) : (
+                                <View style={styles.profilePhotoPlaceholder}>
+                                    <Ionicons name="person" size={40} color="#6C63FF" />
+                                    <Text style={styles.uploadHintText}>Tap to upload</Text>
+                                </View>
+                            )}
+                            
+                            <View style={styles.cameraOverlay}>
+                                {imageLoading ? (
+                                    <ActivityIndicator size="small" color="white" />
+                                ) : (
+                                    <Ionicons name="camera" size={16} color="white" />
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                            style={styles.uploadButton}
+                            onPress={showImageOptions}
+                            disabled={imageLoading}
+                        >
+                            <Ionicons name="cloud-upload" size={16} color="#6C63FF" />
+                            <Text style={styles.uploadButtonText}>
+                                {profileImage ? 'Change Photo' : 'Upload Photo'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View> */}
+                    
                     <Ionicons name="person-circle" size={60} color="#6C63FF" />
                     <Text style={styles.headerTitle}>Update Profile</Text>
                     <Text style={styles.headerSubtitle}>Update your personal information</Text>
@@ -392,6 +539,38 @@ const UpdateProfileForm = ({ setValue }) => {
                     <View style={styles.bottomSpacing} />
                 </Animated.View>
             </ScrollView>
+
+            {/* Permission Modal */}
+            {/* <Modal
+                animationType="fade"
+                transparent={true}
+                visible={showPermissionModal}
+                onRequestClose={() => setShowPermissionModal(false)}
+            >
+                <View style={styles.permissionModalOverlay}>
+                    <View style={styles.permissionModalContent}>
+                        <Ionicons name="camera" size={50} color="#6C63FF" />
+                        <Text style={styles.permissionModalTitle}>Camera Permission Required</Text>
+                        <Text style={styles.permissionModalText}>
+                            To upload or take profile photos, please allow access to your camera and photo library.
+                        </Text>
+                        <View style={styles.permissionModalButtons}>
+                            <TouchableOpacity
+                                style={[styles.permissionButton, styles.cancelButton]}
+                                onPress={() => setShowPermissionModal(false)}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.permissionButton, styles.allowButton]}
+                                onPress={requestPermissions}
+                            >
+                                <Text style={styles.allowButtonText}>Allow</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal> */}
         </View>
     );
 };
@@ -499,6 +678,106 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         paddingVertical: 20,
     },
+    // profilePhotoContainer: {
+    //     alignItems: 'center',
+    //     marginBottom: 20,
+    // },
+    // profilePhotoWrapper: {
+    //     position: 'relative',
+    //     width: 120,
+    //     height: 120,
+    //     borderRadius: 60,
+    //     marginBottom: 10,
+    // },
+    // profilePhotoGlow: {
+    //     position: 'absolute',
+    //     top: -4,
+    //     left: -4,
+    //     right: -4,
+    //     bottom: -4,
+    //     borderRadius: 64,
+    //     backgroundColor: 'rgba(108, 99, 255, 0.2)',
+    //     zIndex: -1,
+    // },
+    // profilePhoto: {
+    //     width: 120,
+    //     height: 120,
+    //     borderRadius: 60,
+    //     borderWidth: 4,
+    //     borderColor: 'rgba(108, 99, 255, 0.3)',
+    // },
+    // profilePhotoPlaceholder: {
+    //     width: 120,
+    //     height: 120,
+    //     borderRadius: 60,
+    //     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    //     borderWidth: 4,
+    //     borderColor: 'rgba(108, 99, 255, 0.3)',
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     shadowColor: '#6C63FF',
+    //     shadowOffset: {
+    //         width: 0,
+    //         height: 8,
+    //     },
+    //     shadowOpacity: 0.2,
+    //     shadowRadius: 16,
+    //     elevation: 8,
+    // },
+    // uploadHintText: {
+    //     fontSize: 12,
+    //     color: '#6C63FF',
+    //     fontWeight: '600',
+    //     marginTop: 4,
+    //     textAlign: 'center',
+    // },
+    // uploadButton: {
+    //     flexDirection: 'row',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     backgroundColor: 'rgba(108, 99, 255, 0.1)',
+    //     borderWidth: 1.5,
+    //     borderColor: 'rgba(108, 99, 255, 0.3)',
+    //     borderRadius: 25,
+    //     paddingVertical: 10,
+    //     paddingHorizontal: 20,
+    //     marginTop: 12,
+    //     shadowColor: '#6C63FF',
+    //     shadowOffset: {
+    //         width: 0,
+    //         height: 4,
+    //     },
+    //     shadowOpacity: 0.1,
+    //     shadowRadius: 8,
+    //     elevation: 3,
+    // },
+    // uploadButtonText: {
+    //     fontSize: 14,
+    //     color: '#6C63FF',
+    //     fontWeight: '600',
+    //     marginLeft: 8,
+    // },
+    // cameraOverlay: {
+    //     position: 'absolute',
+    //     bottom: 5,
+    //     right: 5,
+    //     width: 35,
+    //     height: 35,
+    //     borderRadius: 17.5,
+    //     backgroundColor: '#6C63FF',
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     borderWidth: 3,
+    //     borderColor: 'white',
+    //     shadowColor: '#000',
+    //     shadowOffset: {
+    //         width: 0,
+    //         height: 2,
+    //     },
+    //     shadowOpacity: 0.25,
+    //     shadowRadius: 8,
+    //     elevation: 5,
+    // },
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -649,6 +928,73 @@ const styles = StyleSheet.create({
     bottomSpacing: {
         height: 50,
     },
+    // permissionModalOverlay: {
+    //     flex: 1,
+    //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     padding: 20,
+    // },
+    // permissionModalContent: {
+    //     backgroundColor: 'white',
+    //     borderRadius: 20,
+    //     padding: 30,
+    //     alignItems: 'center',
+    //     shadowColor: '#000',
+    //     shadowOffset: {
+    //         width: 0,
+    //         height: 10,
+    //     },
+    //     shadowOpacity: 0.25,
+    //     shadowRadius: 20,
+    //     elevation: 15,
+    //     maxWidth: 350,
+    //     width: '100%',
+    // },
+    // permissionModalTitle: {
+    //     fontSize: 20,
+    //     fontWeight: 'bold',
+    //     color: '#333',
+    //     marginTop: 15,
+    //     marginBottom: 10,
+    //     textAlign: 'center',
+    // },
+    // permissionModalText: {
+    //     fontSize: 16,
+    //     color: '#666',
+    //     textAlign: 'center',
+    //     lineHeight: 24,
+    //     marginBottom: 25,
+    // },
+    // permissionModalButtons: {
+    //     flexDirection: 'row',
+    //     gap: 15,
+    //     width: '100%',
+    // },
+    // permissionButton: {
+    //     flex: 1,
+    //     paddingVertical: 12,
+    //     borderRadius: 15,
+    //     alignItems: 'center',
+    // },
+    // cancelButton: {
+    //     backgroundColor: '#f3f4f6',
+    //     borderWidth: 1,
+    //     borderColor: '#d1d5db',
+    // },
+    // allowButton: {
+    //     backgroundColor: '#6C63FF',
+    // },
+    // cancelButtonText: {
+    //     color: '#6b7280',
+    //     fontSize: 16,
+    //     fontWeight: '600',
+    // },
+    // allowButtonText: {
+    //     color: 'white',
+    //     fontSize: 16,
+    //     fontWeight: '600',
+    // },
 });
 
 export default UpdateProfileForm;

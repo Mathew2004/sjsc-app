@@ -3,6 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TakeMarks() {
     const navigation = useNavigation();
@@ -154,25 +155,13 @@ export default function TakeMarks() {
         <View style={styles.container}>
 
             {data.length === 0 && <Text style={styles.noStudentsText}>No students found</Text>}
-            <Text style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                textAlign: 'center',
-                marginBottom: 20,
-            }}>
-                {examName}
-            </Text>
             {/* Add a Search bar */}
-            <View>
+            <View style={styles.searchContainer}>
+                <Ionicons name="search-outline" size={18} color="#9ca3af" style={styles.searchIcon} />
                 <TextInput
-                    style={{
-                        borderWidth: 1,
-                        borderColor: '#ddd',
-                        borderRadius: 5,
-                        padding: 10,
-                        marginBottom: 20,
-                    }}
+                    style={styles.searchInput}
                     placeholder="Search by roll or name"
+                    placeholderTextColor="#9ca3af"
                     onChangeText={(e) => searchByRollOrName(e)}
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -248,8 +237,11 @@ export default function TakeMarks() {
             </ScrollView>
 
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={processing}>
-                {processing ? <ActivityIndicator color="white" /> : null}
-                <Text style={styles.submitButtonText}>Submit Marks</Text>
+                {processing && <ActivityIndicator color="white" size="small" style={styles.submitLoader} />}
+                <Ionicons name="checkmark-circle" size={20} color="white" />
+                <Text style={styles.submitButtonText}>
+                    {processing ? 'Submitting...' : 'Submit Marks'}
+                </Text>
             </TouchableOpacity>
         </View>
 
@@ -260,57 +252,104 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+        backgroundColor: '#f8fafc',
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    searchIcon: {
+        marginRight: 10,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#1f2937',
+        fontWeight: '500',
     },
     noStudentsText: {
-        color: 'red',
+        color: '#ef4444',
         fontSize: 16,
         textAlign: 'center',
         marginTop: 20,
+        fontWeight: '600',
     },
     studentCard: {
-        marginVertical: 10,
-        padding: 10,
+        marginVertical: 4,
+        padding: 16,
         borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        backgroundColor: '#f9f9f9',
+        borderColor: '#e5e7eb',
+        borderRadius: 12,
+        backgroundColor: 'white',
     },
     studentRoll: {
-        fontWeight: 'bold',
+        fontWeight: '700',
         fontSize: 12,
         marginBottom: 8,
         width: '70%',
+        color: '#1f2937',
     },
     marksRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        gap: 8,
     },
     input: {
         flex: 1,
-        marginHorizontal: 5,
-        padding: 10,
+        marginHorizontal: 4,
+        padding: 12,
         borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
+        borderColor: '#d1d5db',
+        borderRadius: 8,
         textAlign: 'center',
+        backgroundColor: '#f9fafb',
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#374151',
     },
     submitButton: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 10,
-        padding: 10,
-        backgroundColor: 'green',
-        borderRadius: 5,
+        gap: 8,
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        backgroundColor: '#10b981',
+        borderRadius: 12,
         marginTop: 20,
+        shadowColor: '#10b981',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    submitLoader: {
+        marginRight: 4,
     },
     submitButtonText: {
         color: 'white',
         textAlign: 'center',
-        fontSize: 18,
+        fontSize: 16,
+        fontWeight: '700',
     },
     scrollView: {
         paddingBottom: 2,
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f8fafc',
     },
 });
 

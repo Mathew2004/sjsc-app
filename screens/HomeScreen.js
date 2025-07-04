@@ -1,48 +1,12 @@
-import React from 'react';
-import { Button, Text, TouchableOpacity, View, StyleSheet, ScrollView, Animated } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Button, Text, TouchableOpacity, View, StyleSheet, ScrollView, Animated, Modal, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
+import axios from 'axios';
 
-// Sample notice data
-const Notices = [
-    {
-        id: 1,
-        title: "Exam Schedule Released",
-        body: "The mid-term examination schedule for all departments has been published. Students are advised to check their respective class schedules and prepare accordingly. The exams will commence from next week.",
-        date: "2025-07-02",
-        priority: "high"
-    },
-    {
-        id: 2,
-        title: "Library Timing Update",
-        body: "The college library will now remain open until 8 PM on weekdays and 6 PM on weekends. Students can make use of the extended hours for their studies and research work.",
-        date: "2025-07-01",
-        priority: "medium"
-    },
-    {
-        id: 3,
-        title: "Sports Day Registration",
-        body: "Registration for the annual sports day is now open. Students interested in participating in various sports events can register with their respective department coordinators before the deadline.",
-        date: "2025-06-30",
-        priority: "low"
-    },
-    {
-        id: 4,
-        title: "Guest Lecture Series",
-        body: "A special guest lecture series on 'Future of Technology' will be conducted by industry experts. All students are encouraged to attend these informative sessions.",
-        date: "2025-06-28",
-        priority: "medium"
-    },
-    {
-        id: 5,
-        title: "Holiday Notice",
-        body: "The college will remain closed on July 15th due to a national holiday. Classes will resume on July 16th as per the regular schedule.",
-        date: "2025-06-25",
-        priority: "high"
-    }
-];
+
 
 const Menus = [
     {
@@ -70,11 +34,11 @@ const Menus = [
         icon: require('../assets/icons/teacher.png'),
         href: 'Teachers',
     },
-    
+
 ];
 
 // Notice Card Component
-const NoticeCard = ({ notice }) => {
+const NoticeCard = ({ notice, onPress }) => {
     const getPriorityColor = (priority) => {
         switch (priority) {
             case 'high': return '#ef4444';
@@ -95,9 +59,9 @@ const NoticeCard = ({ notice }) => {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
         });
     };
 
@@ -107,13 +71,17 @@ const NoticeCard = ({ notice }) => {
     };
 
     return (
-        <View style={styles.noticeCard}>
+        <TouchableOpacity
+            style={styles.noticeCard}
+            onPress={() => onPress(notice)}
+            activeOpacity={0.8}
+        >
             <View style={styles.noticeHeader}>
                 <View style={styles.noticeTitleContainer}>
-                    <Ionicons 
-                        name={getPriorityIcon(notice.priority)} 
-                        size={16} 
-                        color={getPriorityColor(notice.priority)} 
+                    <Ionicons
+                        name={getPriorityIcon(notice.priority)}
+                        size={16}
+                        color={getPriorityColor(notice.priority)}
                         style={styles.priorityIcon}
                     />
                     <Text style={styles.noticeTitle} numberOfLines={1}>
@@ -126,37 +94,108 @@ const NoticeCard = ({ notice }) => {
                 {truncateText(notice.body)}
             </Text>
             <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(notice.priority) }]} />
-        </View>
+        </TouchableOpacity>
     );
 };
 
 export default function HomeScreen() {
     console.log("Home");
     const navigation = useNavigation();
-    
+
+    const [notices, setNotices] = useState([]);
+    const [loadingNotices, setLoadingNotices] = useState(true);
+    const [selectedNotice, setSelectedNotice] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+
+    // Fetch notices from API
+    useEffect(() => {
+        const fetchNotices = async () => {
+            try {
+                setLoadingNotices(true);
+                const res = await axios.get(
+                    `https://sjsc-backend-production.up.railway.app/api/v1/notices/fetch`
+                );
+                console.log('API Response:', res.data);
+                const data = res.data.data || [];
+                console.log('Notices data:', data);
+                // Transform API data to match NoticeCard props
+                const transformedNotices = data.map(notice => ({
+                    id: notice._id || notice.id,
+                    title: notice.title,
+                    body: notice.description,
+                    priority: notice.priority || 'medium',
+                    date: notice.date ? notice.date : new Date().toISOString(),
+                    type: notice.type || 'general'
+                }));
+                console.log('Transformed notices:', transformedNotices);
+
+                setNotices(transformedNotices);
+            } catch (error) {
+                console.error('Error fetching notices:', error);
+                // Fallback to empty array if API fails
+                setNotices([]);
+            } finally {
+                setLoadingNotices(false);
+            }
+        };
+
+        fetchNotices();
+    }, []);
+
+    const handleNoticePress = (notice) => {
+        console.log('Notice pressed:', notice);
+        setSelectedNotice(notice);
+        setModalVisible(true);
+    };
+
+    const formatFullDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
     return (
-        // <LinearGradient
-        //     colors={['#f8f9fa', '#e9ecef', '#dee2e6']}
-        //     style={styles.container}
-        // >
         <View style={styles.container}>
             {/* Notice Section */}
-            <View style={styles.noticeSection}>
-                <View style={styles.noticeSectionHeader}>
-                    <Ionicons name="notifications" size={22} color="#6366f1" />
-                    <Text style={styles.noticeSectionTitle}>Latest Notices</Text>
+            {notices && notices.length > 0 && (
+                <View style={styles.noticeSection}>
+                    <View style={styles.noticeSectionHeader}>
+                        <Ionicons name="notifications" size={22} color="#6366f1" />
+                        <Text style={styles.noticeSectionTitle}>Latest Notices</Text>
+                    </View>
+
+                    {loadingNotices ? (
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="large" color="#6366f1" />
+                            <Text style={styles.loadingText}>Loading notices...</Text>
+                        </View>
+                    ) : notices.length > 0 ? (
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.noticeScrollContainer}
+                            style={styles.noticeScrollView}
+                        >
+                            {notices.map((notice) => (
+                                <NoticeCard
+                                    key={notice.id}
+                                    notice={notice}
+                                    onPress={() => handleNoticePress(notice)}
+                                />
+                            ))}
+                        </ScrollView>
+                    ) : (
+                        <View style={styles.emptyNoticesContainer}>
+                            <Ionicons name="document-outline" size={48} color="#9ca3af" />
+                            <Text style={styles.emptyNoticesText}>No notices available</Text>
+                        </View>
+                    )}
                 </View>
-                <ScrollView 
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.noticeScrollContainer}
-                    style={styles.noticeScrollView}
-                >
-                    {Notices.map((notice) => (
-                        <NoticeCard key={notice.id} notice={notice} />
-                    ))}
-                </ScrollView>
-            </View>
+            )}
 
             {/* Quick Actions Section */}
             <View style={styles.sectionHeader}>
@@ -164,7 +203,7 @@ export default function HomeScreen() {
                 <View style={styles.sectionUnderline} />
             </View>
 
-            <ScrollView 
+            <ScrollView
                 style={styles.menuContainer}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.menuContent}
@@ -180,7 +219,63 @@ export default function HomeScreen() {
                 {/* Bottom Spacing */}
                 <View style={styles.bottomSpacing} />
             </ScrollView>
-            </View>
+
+            {/* Notice Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Notice Details</Text>
+                            <TouchableOpacity
+                                onPress={() => setModalVisible(false)}
+                                style={styles.closeButton}
+                            >
+                                <Ionicons name="close" size={24} color="#6b7280" />
+                            </TouchableOpacity>
+                        </View>
+
+                        {selectedNotice && (
+                            <ScrollView style={styles.modalContent}>
+                                <View style={styles.modalNoticeHeader}>
+                                    <Text style={styles.modalNoticeTitle}>
+                                        {selectedNotice.title || 'No title'}
+                                    </Text>
+                                    <Text style={styles.modalNoticeDate}>
+                                        {formatFullDate(selectedNotice.date)}
+                                    </Text>
+                                </View>
+
+                                <View style={styles.modalNoticeBody}>
+                                    <Text style={styles.modalNoticeBodyText}>
+                                        {selectedNotice.body || selectedNotice.description || 'No description available'}
+                                    </Text>
+                                </View>
+
+                                <View style={styles.modalNoticePriority}>
+                                    <Text style={styles.modalPriorityLabel}>For </Text>
+                                    <View style={[
+                                        styles.priorityBadge,
+                                        {
+                                            backgroundColor: selectedNotice.level === 'Colllege' ? '#ef4444' :
+                                                selectedNotice.level === 'School' ? '#f59e0b' : '#10b981'
+                                        }
+                                    ]}>
+                                        <Text style={styles.priorityBadgeText}>
+                                            {(selectedNotice.level || 'All').toUpperCase()}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        )}
+                    </View>
+                </View>
+            </Modal>
+        </View>
     );
 };
 
@@ -320,6 +415,111 @@ const styles = StyleSheet.create({
     },
     bottomSpacing: {
         height: 30,
+    },
+    loadingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 40,
+        paddingHorizontal: 20,
+    },
+    loadingText: {
+        marginLeft: 12,
+        fontSize: 16,
+        color: '#6b7280',
+        fontWeight: '500',
+    },
+    emptyNoticesContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 40,
+        paddingHorizontal: 20,
+    },
+    emptyNoticesText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: '#9ca3af',
+        fontWeight: '500',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContainer: {
+        backgroundColor: 'white',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        maxHeight: '80%',
+        paddingTop: 20,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f3f4f6',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1f2937',
+    },
+    closeButton: {
+        padding: 8,
+        borderRadius: 12,
+        backgroundColor: '#f9fafb',
+    },
+    modalContent: {
+        paddingHorizontal: 20,
+    },
+    modalNoticeHeader: {
+        paddingVertical: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f3f4f6',
+    },
+    modalNoticeTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#1f2937',
+        marginBottom: 8,
+        lineHeight: 32,
+    },
+    modalNoticeDate: {
+        fontSize: 14,
+        color: '#6b7280',
+        fontWeight: '500',
+    },
+    modalNoticeBody: {
+        paddingVertical: 20,
+    },
+    modalNoticeBodyText: {
+        fontSize: 16,
+        color: '#374151',
+        lineHeight: 24,
+    },
+    modalNoticePriority: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingBottom: 30,
+    },
+    modalPriorityLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#374151',
+        marginRight: 12,
+    },
+    priorityBadge: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    priorityBadgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold',
     },
 });
 
