@@ -217,21 +217,6 @@ export default function EditMarks() {
                                 </View>
 
                                 <View style={styles.marksRow}>
-                                    {mcq && (
-                                        <TextInput
-                                            style={[
-                                                styles.input,
-                                                !disabled && styles.disabledInput
-                                            ]}
-                                            placeholder="MCQ"
-                                            keyboardType="numeric"
-                                            value={String(marks[item.Student.id]?.mcq || '')}
-                                            onChangeText={text => handleInputChange(item.Student.id, 'mcq', text)}
-                                            ref={setInputRef(item.id, 'mcq')}
-                                            onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
-                                            editable={disabled}
-                                        />
-                                    )}
 
                                     {written && (
                                         <TextInput
@@ -248,6 +233,23 @@ export default function EditMarks() {
                                             editable={disabled}
                                         />
                                     )}
+
+                                    {mcq && (
+                                        <TextInput
+                                            style={[
+                                                styles.input,
+                                                !disabled && styles.disabledInput
+                                            ]}
+                                            placeholder="MCQ"
+                                            keyboardType="numeric"
+                                            value={String(marks[item.Student.id]?.mcq || '')}
+                                            onChangeText={text => handleInputChange(item.Student.id, 'mcq', text)}
+                                            ref={setInputRef(item.id, 'mcq')}
+                                            onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
+                                            editable={disabled}
+                                        />
+                                    )}
+
 
                                     {practical && (
                                         <TextInput

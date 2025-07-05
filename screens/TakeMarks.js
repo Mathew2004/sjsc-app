@@ -193,18 +193,6 @@ export default function TakeMarks() {
                             )}
                         </View>
                         <View style={styles.marksRow}>
-                            {mcq && (
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="MCQ"
-                                    keyboardType="numeric"
-                                    value={marks[item.id]?.mcq || ''}
-                                    onChangeText={text => handleInputChange(item.id, 'mcq', text)}
-                                    returnKeyType="next"
-                                    ref={setInputRef(item.id, 'mcq')}
-                                    onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
-                                />
-                            )}
                             {written && (
                                 <TextInput
                                     style={styles.input}
@@ -215,6 +203,18 @@ export default function TakeMarks() {
                                     returnKeyType="next"
                                     ref={setInputRef(item.id, 'written')}
                                     onSubmitEditing={() => focusNextInput(item.id, 'written')}
+                                />
+                            )}
+                            {mcq && (
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="MCQ"
+                                    keyboardType="numeric"
+                                    value={marks[item.id]?.mcq || ''}
+                                    onChangeText={text => handleInputChange(item.id, 'mcq', text)}
+                                    returnKeyType="next"
+                                    ref={setInputRef(item.id, 'mcq')}
+                                    onSubmitEditing={() => focusNextInput(item.id, 'mcq')}
                                 />
                             )}
                             {practical && (

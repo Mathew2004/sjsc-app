@@ -2,12 +2,15 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTeacher } from '../hooks';
 
 const Header = () => {
     const navigation = useNavigation();
+    const { teacher } = useTeacher();
     const goProfile = () => {
         navigation.navigate('Profile');
     };
+
     return (
         <View style={[styles.header, { backgroundColor: '#667eea' }]} >
             {/* Decorative elements */}
@@ -27,7 +30,7 @@ const Header = () => {
                     </View>
                     <View style={styles.textContainer}>
                         <Text style={styles.headerTextBold}>SJSC Teachers</Text>
-                        <Text style={styles.headerSubtext}>Learning Management</Text>
+                        <Text style={styles.headerSubtext}>Welcome, {teacher?.name || "Teacher"}</Text>
                     </View>
                 </View>
 
@@ -35,7 +38,7 @@ const Header = () => {
                 <TouchableOpacity onPress={goProfile} style={styles.profileButton}>
                     <View style={styles.profileContainer}>
                         <Image
-                            source={{ uri: "https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png" }}
+                            source={{ uri: teacher?.extra?.image || "https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png" }}
                             style={styles.profileImage}
                         />
                         <View style={styles.onlineIndicator} />

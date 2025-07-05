@@ -13,22 +13,40 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "The app needs access to your photos to let you pick images.",
+        "NSCameraUsageDescription": "The app needs access to your camera to let you take photos."
+      }
     },
     "android": {
-      "versionCode": 4,  
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/sjsc.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.evangel_matt.sjscapp",
-      "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb"
+      "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "extra": {
       "eas": {
         "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you pick images.",
+          "cameraPermission": "The app needs access to your camera to let you take photos."
+        }
+      ]
+    ]
   },
   "jsEngine": "hermes"
 }
