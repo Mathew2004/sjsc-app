@@ -2,7 +2,7 @@
   "expo": {
     "name": "SJSC ",
     "slug": "sjsc-app",
-    "version": "1.0.4",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/sjsc.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
       }
     },
     "android": {
-      "versionCode": 4,
+      "versionCode": 7,
       "adaptiveIcon": {
         "foregroundImage": "./assets/sjsc.png",
         "backgroundColor": "#ffffff"

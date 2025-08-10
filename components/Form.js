@@ -330,12 +330,12 @@ const TeacherDropdownForm = () => {
                     </View>
 
                     {schoolValue === "school" && (
-                        <Animated.View style={[styles.inputGroup, { opacity: fadeAnim }]}>
+                        <Animated.View style={[styles.inputGroup, { zIndex: 100 }]}>
                             <View style={styles.labelContainer}>
                                 <Ionicons name="time" size={18} color="#FF6B6B" />
                                 <Text style={styles.label}>Study Shift</Text>
                             </View>
-                            <View style={styles.dropdownWrapper}>
+                            <View style={[styles.dropdownWrapper, { zIndex: 3400 }]}>
                                 <DropDownPicker
                                     open={openShift}
                                     value={shiftValue}
@@ -346,7 +346,7 @@ const TeacherDropdownForm = () => {
                                     placeholder="🌅 Select Shift"
                                     style={styles.dropdown}
                                     textStyle={styles.dropdownText}
-                                    zIndex={4000}
+                                    zIndex={3000}
                                     listMode="SCROLLVIEW"
                                     dropDownContainerStyle={styles.dropdownContainer}
                                 />

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Text, TouchableOpacity, View, StyleSheet, ScrollView, Animated, Modal, ActivityIndicator } from 'react-native';
+import { Button, Text, TouchableOpacity, View, StyleSheet, ScrollView, Animated, Modal, ActivityIndicator, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
 import axios from 'axios';
+import { useTeacher } from '../hooks';
 
 
 
@@ -102,43 +103,53 @@ export default function HomeScreen() {
     console.log("Home");
     const navigation = useNavigation();
 
+    const { teacher } = useTeacher();
+    const teachers_level = teacher?.assignedClasses[0]?.level;
+
     const [notices, setNotices] = useState([]);
     const [loadingNotices, setLoadingNotices] = useState(true);
     const [selectedNotice, setSelectedNotice] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-
+    const [refreshing, setRefreshing] = useState(false);
+    console.log('Teacher Level:', teachers_level);
     // Fetch notices from API
+    const fetchNotices = async () => {
+        try {
+            setLoadingNotices(true);
+            const res = await axios.get(
+                `https://sjsc-backend-production.up.railway.app/api/v1/notices/fetch`
+            );
+            console.log('API Response:', res.data);
+            const data = res.data.data || [];
+            console.log('Notices data:', data);
+            // Transform API data to match NoticeCard props
+            const transformedNotices = data.map(notice => ({
+                id: notice._id || notice.id,
+                title: notice.title,
+                body: notice.description,
+                priority: notice.priority || 'medium',
+                level: notice.level || 'All',
+                date: notice.date ? notice.date : new Date().toISOString(),
+                type: notice.type || 'general'
+            }));
+            console.log('Transformed notices:', transformedNotices);
+
+            setNotices(transformedNotices);
+        } catch (error) {
+            console.error('Error fetching notices:', error);
+            // Fallback to empty array if API fails
+            setNotices([]);
+        } finally {
+            setLoadingNotices(false);
+        }
+    };
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchNotices().finally(() => setRefreshing(false));
+    }, []);
+
     useEffect(() => {
-        const fetchNotices = async () => {
-            try {
-                setLoadingNotices(true);
-                const res = await axios.get(
-                    `https://sjsc-backend-production.up.railway.app/api/v1/notices/fetch`
-                );
-                console.log('API Response:', res.data);
-                const data = res.data.data || [];
-                console.log('Notices data:', data);
-                // Transform API data to match NoticeCard props
-                const transformedNotices = data.map(notice => ({
-                    id: notice._id || notice.id,
-                    title: notice.title,
-                    body: notice.description,
-                    priority: notice.priority || 'medium',
-                    date: notice.date ? notice.date : new Date().toISOString(),
-                    type: notice.type || 'general'
-                }));
-                console.log('Transformed notices:', transformedNotices);
-
-                setNotices(transformedNotices);
-            } catch (error) {
-                console.error('Error fetching notices:', error);
-                // Fallback to empty array if API fails
-                setNotices([]);
-            } finally {
-                setLoadingNotices(false);
-            }
-        };
-
         fetchNotices();
     }, []);
 
@@ -159,9 +170,19 @@ export default function HomeScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView 
+            style={styles.container}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={['#6366f1']}
+                    tintColor="#6366f1"
+                />
+            }
+        >
             {/* Notice Section */}
-            {notices && notices.length > 0 && (
+            {notices && notices.length > 0 && notices.some(notice => notice.level === teachers_level || notice.level === 'All') && (
                 <View style={styles.noticeSection}>
                     <View style={styles.noticeSectionHeader}>
                         <Ionicons name="notifications" size={22} color="#6366f1" />
@@ -180,13 +201,19 @@ export default function HomeScreen() {
                             contentContainerStyle={styles.noticeScrollContainer}
                             style={styles.noticeScrollView}
                         >
-                            {notices.map((notice) => (
-                                <NoticeCard
-                                    key={notice.id}
-                                    notice={notice}
-                                    onPress={() => handleNoticePress(notice)}
-                                />
-                            ))}
+                            {notices.map((notice) => {
+                                if (notice.level === teachers_level || notice.level === 'All') {
+                                    return (
+                                        <NoticeCard
+                                            key={notice.id}
+                                            notice={notice}
+                                            onPress={() => handleNoticePress(notice)}
+                                        />
+                                    );
+                                } else {
+                                    return <View><Text>No notices available</Text></View>;
+                                }
+                            })}
                         </ScrollView>
                     ) : (
                         <View style={styles.emptyNoticesContainer}>
@@ -203,11 +230,7 @@ export default function HomeScreen() {
                 <View style={styles.sectionUnderline} />
             </View>
 
-            <ScrollView
-                style={styles.menuContainer}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.menuContent}
-            >
+            <View style={styles.menuContainer}>
                 <View style={styles.menuGrid}>
                     {Menus.map((menu, index) => (
                         <View key={index} style={styles.cardWrapper}>
@@ -218,7 +241,7 @@ export default function HomeScreen() {
 
                 {/* Bottom Spacing */}
                 <View style={styles.bottomSpacing} />
-            </ScrollView>
+            </View>
 
             {/* Notice Modal */}
             <Modal
@@ -275,7 +298,7 @@ export default function HomeScreen() {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </ScrollView>
     );
 };
 

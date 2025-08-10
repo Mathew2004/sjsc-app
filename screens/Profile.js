@@ -215,13 +215,11 @@ const UpdateProfileForm = ({ setValue }) => {
                         }
                     );
                     
-                    console.log('Upload response:', uploadResponse.data);
                     if (uploadResponse.status === 200) {
-                        // Set the uploaded image URL
                         const imageUrl = uploadResponse.data.imageUrl || result.assets[0].uri;
+                        console.log('Profile image uploaded successfully:', imageUrl);
                         setProfileImage(imageUrl);
                         Alert.alert('Success', 'Profile image uploaded successfully!');
-                        console.log('Profile image uploaded successfully');
                     }
                 } catch (uploadError) {
                     console.error('Error uploading image:', uploadError);

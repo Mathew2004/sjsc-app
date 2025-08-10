@@ -8,6 +8,7 @@ export const useTeacher = () => {
     const [error, setError] = useState(null);
     const [token, setToken] = useState(null);
     const [teacherId, setTeacherId] = useState(null);
+    const [teachersLevel, setTeachersLevel] = useState(null);
 
     // Fetch teacher data from API
     const fetchTeacher = async (id, authToken) => {

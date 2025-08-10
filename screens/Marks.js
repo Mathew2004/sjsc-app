@@ -355,7 +355,7 @@ const Marks = () => {
                             </View>
 
                             {schoolValue === "school" && (
-                                <Animated.View style={[styles.inputGroup, { opacity: fadeAnim }]}>
+                                <Animated.View style={[styles.inputGroup, { zIndex: 100 }]}>
                                     <View style={styles.labelContainer}>
                                         <Ionicons name="time" size={18} color="#FF6B6B" />
                                         <Text style={styles.label}>Shift</Text>
