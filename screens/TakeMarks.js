@@ -178,7 +178,15 @@ export default function TakeMarks() {
                             gap: 10,
                             marginBottom: 10,
                         }}>
-                            <Text style={styles.studentRoll}>{item.roll} - {item.name}</Text>
+                            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={styles.studentRoll}>{item.roll} - {item.name}</Text>
+                                {(written || mcq) && (
+                                    <Text style={{ backgroundColor: 'darkgreen', color: "white", paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 }}>
+                                        Total : {(parseFloat(marks[item.id]?.mcq) || 0) + (parseFloat(marks[item.id]?.written) || 0) + (parseFloat(marks[item.id]?.practical) || 0)}
+                                    </Text>
+                                )}
+
+                            </View>
                             {quiz && (
                                 <TextInput
                                     style={styles.input}

@@ -2,7 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
 
 export default function EditMarks() {
     const navigation = useNavigation();
@@ -84,18 +86,17 @@ export default function EditMarks() {
             ...prevMarks,
             [studentId]: {
                 ...prevMarks[studentId],
-                [field]: value,
+                [field]: value || 0,
                 teacherId: teacher_id,
             },
         }));
-
         try {
             const rs = await axios.put(
                 `https://sjsc-backend-production.up.railway.app/api/v1/marks/update-marks/${markId}`, {
                 // `http://192.168.0.108:3000/api/v1/marks/update-marks/${markId}`, {
                 studentId: studentId,
                 teacherId: teacher_id,
-                [field]: value,
+                [field]: value || 0,
             });
             if (rs.data.status == "success") {
                 console.log('Marks Updated');
@@ -195,9 +196,16 @@ export default function EditMarks() {
                                     gap: 10,
                                     marginBottom: 10,
                                 }}>
-                                    <Text style={styles.studentRoll}>
-                                        {item?.Student?.roll} - {item?.Student?.name}
-                                    </Text>
+                                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={styles.studentRoll}>
+                                            {item?.Student?.roll} - {item?.Student?.name}
+                                        </Text>
+                                        {(written || mcq) && (
+                                            <Text style={{ backgroundColor: 'darkgreen', color: "white", paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 }}>
+                                                Total : {(parseFloat(marks[item.Student.id]?.mcq) || 0) + (parseFloat(marks[item.Student.id]?.written) || 0) + (parseFloat(marks[item.Student.id]?.practical) || 0)}
+                                            </Text>
+                                        )}
+                                    </View>
 
                                     {quiz && (
                                         <TextInput
@@ -274,6 +282,15 @@ export default function EditMarks() {
 
             </ScrollView>
 
+
+            <TouchableOpacity style={styles.submitButton} onPress={() => { setProcessing(false); alert("Marks Updated"); }} disabled={processing}>
+                {processing && <ActivityIndicator color="white" size="small" style={styles.submitLoader} />}
+                <Ionicons name="checkmark-circle" size={20} color="white" />
+                <Text style={styles.submitButtonText}>
+                    {processing ? 'Submitting...' : 'Submit Marks'}
+                </Text>
+            </TouchableOpacity>
+
             {/* <View style={{ paddingBottom: 100 }} /> */}
         </KeyboardAvoidingView>
     );
@@ -323,15 +340,32 @@ const styles = StyleSheet.create({
         color: '#999',
     },
     submitButton: {
-        padding: 15,
-        backgroundColor: 'green',
-        borderRadius: 5,
-        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        backgroundColor: '#10b981',
+        borderRadius: 12,
+        margin: 10,
+        shadowColor: '#10b981',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    submitLoader: {
+        marginRight: 4,
     },
     submitButtonText: {
         color: 'white',
         textAlign: 'center',
-        fontSize: 18,
+        fontSize: 16,
+        fontWeight: '700',
     },
     scrollView: {
         paddingBottom: 200,
