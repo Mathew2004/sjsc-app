@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "725483822231",
+    "project_id": "sjsc-b52eb",
+    "storage_bucket": "sjsc-b52eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725483822231:android:adc4f827719a0e2c9a5dd2",
+        "android_client_info": {
+          "package_name": "com.evangel_matt.sjscapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA94Ut3ybzT-KMwfs0TjVOijY2fIB9o0x0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725483822231:android:274e31790099a6b79a5dd2",
+        "android_client_info": {
+          "package_name": "com.sjsc.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA94Ut3ybzT-KMwfs0TjVOijY2fIB9o0x0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

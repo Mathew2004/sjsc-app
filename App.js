@@ -17,6 +17,9 @@ import Profile from './screens/Profile';
 import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
+import * as Notifications from 'expo-notifications';
+import { registerForPushNotificationsAsync } from './utils/notifications';
+import axios from 'axios';
 
 
 const Stack = createNativeStackNavigator();
@@ -27,6 +30,41 @@ export default function App() {
   const [value, setValue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const token = await AsyncStorage.getItem("token");
+      const teacher_id = await AsyncStorage.getItem("teacher-id");
+      const fcmToken = await registerForPushNotificationsAsync();
+      // send token to your backend
+      await axios.post(
+        `https://sjsc-backend-production.up.railway.app/api/v1/save-fcm-token`,
+        {
+          fcmToken: fcmToken,
+          teacher_id: teacher_id
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+    })();
+
+    const sub1 = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Foreground notification:', notification);
+    });
+
+    const sub2 = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('User tapped notification:', response.notification.request.content.data);
+    });
+
+
+    return () => {
+      sub1.remove();
+      sub2.remove();
+    };
+  }, []);
+
 
 
   useEffect(() => {
@@ -54,143 +92,143 @@ export default function App() {
 
   return (
     <>
-     <StatusBar barStyle="dark-content" backgroundColor="#667eea" />
+      <StatusBar barStyle="dark-content" backgroundColor="#667eea" />
       <NavigationContainer>
         <Stack.Navigator>
           {
             value === null ? (
-            <Stack.Screen
-              name="Login"
-              options={{
-                headerShown: false
-              }}
-            >
-              {(props) => (
-                <SafeAreaView style={{ flex: 1 }}>
-                  <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <LoginScreen {...props} setValue={setValue} />
-                  </ScrollView>
-                </SafeAreaView>
-              )}
-            </Stack.Screen>
-          ) : (
-            <>
               <Stack.Screen
-                name="Home"
+                name="Login"
                 options={{
-                  header: () => <Header />,
+                  headerShown: false
                 }}
               >
                 {(props) => (
                   <SafeAreaView style={{ flex: 1 }}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                      <HomeScreen {...props} setValue={setValue} />
+                      <LoginScreen {...props} setValue={setValue} />
                     </ScrollView>
                   </SafeAreaView>
                 )}
               </Stack.Screen>
+            ) : (
+              <>
+                <Stack.Screen
+                  name="Home"
+                  options={{
+                    header: () => <Header />,
+                  }}
+                >
+                  {(props) => (
+                    <SafeAreaView style={{ flex: 1 }}>
+                      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                        <HomeScreen {...props} setValue={setValue} />
+                      </ScrollView>
+                    </SafeAreaView>
+                  )}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="Attendance"
-                component={Attendance}
-                options={{
-                  title: 'Attendance',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="TakeAttendance"
-                component={TakeAttendance}
-                options={{
-                  title: 'Attendance',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="Marks"
-                component={Marks}
-                options={{
-                  title: 'Marks',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="Notice"
-                component={Notice}
-                options={{
-                  title: 'Attendance History',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="Teachers"
-                component={Teachers}
-                options={{
-                  title: 'Teachers',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
+                <Stack.Screen
+                  name="Attendance"
+                  component={Attendance}
+                  options={{
+                    title: 'Attendance',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="TakeAttendance"
+                  component={TakeAttendance}
+                  options={{
+                    title: 'Attendance',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Marks"
+                  component={Marks}
+                  options={{
+                    title: 'Marks',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Notice"
+                  component={Notice}
+                  options={{
+                    title: 'Attendance History',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Teachers"
+                  component={Teachers}
+                  options={{
+                    title: 'Teachers',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
 
-              />
-              <Stack.Screen
-                name="ViewAttendance"
-                component={ViewAttendance}
-                options={{
-                  title: 'View Attendance',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="TakeMarks"
-                component={TakeMarks}
-                options={{
-                  title: 'Put Marks',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="EditMarks"
-                component={EditMarks}
-                options={{
-                  title: 'Edit Marks',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              <Stack.Screen
-                name="MarksList"
-                component={MarksLists}
-                options={{
-                  title: 'Marks List',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center',
-                  detachPreviousScreen: false,
-                }}
-              />
-              {/* <Stack.Screen
+                />
+                <Stack.Screen
+                  name="ViewAttendance"
+                  component={ViewAttendance}
+                  options={{
+                    title: 'View Attendance',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="TakeMarks"
+                  component={TakeMarks}
+                  options={{
+                    title: 'Put Marks',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="EditMarks"
+                  component={EditMarks}
+                  options={{
+                    title: 'Edit Marks',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="MarksList"
+                  component={MarksLists}
+                  options={{
+                    title: 'Marks List',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                {/* <Stack.Screen
                 name="Profile"
                 component={Profile}
                 options={{
@@ -201,26 +239,26 @@ export default function App() {
                   headerTextAlign: 'center'
                 }}
               /> */}
-              <Stack.Screen
-                name="Profile"
-                options={{
-                  title: 'Profile',
-                  headerStyle: { backgroundColor: '#eee' },
-                  headerTintColor: '#111',
-                  headerTextAlign: 'center'
-                }}
-              >
-                {(props) => (
-                  <SafeAreaView style={{ flex: 1 }}>
-                    <Profile setValue={setValue} />
-                  </SafeAreaView>
-                )}
-              </Stack.Screen>
-            </>
-          )
-        }
-      </Stack.Navigator>
-    </NavigationContainer>
+                <Stack.Screen
+                  name="Profile"
+                  options={{
+                    title: 'Profile',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center'
+                  }}
+                >
+                  {(props) => (
+                    <SafeAreaView style={{ flex: 1 }}>
+                      <Profile setValue={setValue} />
+                    </SafeAreaView>
+                  )}
+                </Stack.Screen>
+              </>
+            )
+          }
+        </Stack.Navigator>
+      </NavigationContainer>
     </>
   );
 }

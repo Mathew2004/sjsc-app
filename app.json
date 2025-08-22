@@ -30,8 +30,15 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
-      ]
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "NOTIFICATIONS"
+
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "extra": {
       "eas": {
@@ -44,6 +51,19 @@
         {
           "photosPermission": "The app needs access to your photos to let you pick images.",
           "cameraPermission": "The app needs access to your camera to let you take photos."
+        }
+      ],
+      [
+        "@react-native-firebase/app",
+        {
+          "android_package_name": "com.evangel_matt.sjscapp"
+        }
+      ],
+      [
+        "@react-native-firebase/messaging",
+        {
+          "android_show_notification_permission_dialog": true,
+          "android_default_channel_id": "default"
         }
       ]
     ]
