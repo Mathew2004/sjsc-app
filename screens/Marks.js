@@ -203,6 +203,8 @@ const Marks = () => {
 
     const TakeMarks = async () => {
         try {
+            if(!examValue) return alert("Please select an exam");
+            if(!subjectValue) return alert("Please select a subject");
             const Tid = await AsyncStorage.getItem("teacher-id");
             const token = await AsyncStorage.getItem("token");
             const payload = {
@@ -296,6 +298,10 @@ const Marks = () => {
             </View>
         );
     }
+
+    const hasGroupAndSection = groupItems?.length && groupValue && sectionItems?.length && sectionValue;
+    const hasOnlyGroup = groupItems?.length && groupValue && !sectionItems?.length;
+    const hasOnlySection = sectionItems?.length && sectionValue && !groupItems?.length;
 
     return (
         <Animated.View style={[styles.mainContainer]}>
@@ -509,10 +515,10 @@ const Marks = () => {
                                 </View>
                             </View>
 
-                            {/* Submit Button */}
-                            {classValue && (groupValue || sectionValue) && (
+                            {/* Submit Button show if groupItems and sectionItems are exist then groupValue and sectionValue must */}
+                            {classValue && (hasGroupAndSection || hasOnlyGroup || hasOnlySection) && (
                                 <Animated.View style={[styles.submitWrapper, { opacity: fadeAnim }]}>
-                                    <TouchableOpacity 
+                                    <TouchableOpacity  
                                         style={[styles.submitButton, submitting && styles.submittingButton]} 
                                         onPress={TakeMarks} 
                                         disabled={submitting}
