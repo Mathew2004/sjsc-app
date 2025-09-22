@@ -104,7 +104,13 @@ const TeacherDropdownForm = () => {
             try {
                 const Tid = await AsyncStorage.getItem('teacher-id');
                 const res = await axios.get(
-                    `https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${Tid}`
+                    `https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${Tid}`,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
                 );
                 setTeacherData(res.data.teacher);
                 setLoading(false);
