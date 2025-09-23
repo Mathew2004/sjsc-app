@@ -31,6 +31,11 @@ const Menus = [
         href: 'MarksList',
     },
     {
+        item: 'Attendance Summary',
+        icon: require('../assets/icons/marks-history.png'),
+        href: 'AttendanceSummary',
+    },
+    {
         item: 'Teachers',
         icon: require('../assets/icons/teacher.png'),
         href: 'Teachers',

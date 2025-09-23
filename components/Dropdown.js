@@ -1,7 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { colors } from "../utils/colors";
 
 const DropDown = ({ items, placeholder, placeholderFocus, setValue, value }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -10,24 +10,23 @@ const DropDown = ({ items, placeholder, placeholderFocus, setValue, value }) => 
     <View>
       <Dropdown
         style={[
-          style.card,
+          styles.dropdown,
           {
-            // width: "100%",
             minWidth: 150,
           },
-          isFocus && { borderColor: theme == "dark" ? colors["teal"]["800"] : colors["teal"][600] },
+          isFocus && { borderColor: colors.primary },
         ]}
         containerStyle={{
           borderRadius: 12,
-          backgroundColor: "gray",
-          borderColor: "gray",
+          backgroundColor: colors.white,
+          borderColor: colors.gray[300],
         }}
-        activeColor={"red"}
-        placeholderStyle={{ color: "gray" }}
-        selectedTextStyle={{ color: "black" }}
+        activeColor={colors.blue[50]}
+        placeholderStyle={{ color: colors.gray[500] }}
+        selectedTextStyle={{ color: colors.dark }}
         data={items}
         maxHeight={400}
-        itemTextStyle={style.p}
+        itemTextStyle={styles.itemText}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? placeholder : placeholder}
@@ -52,10 +51,15 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     height: 50,
-    borderColor: "gray",
-    borderWidth: 0.5,
+    borderColor: colors.gray[300],
+    borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    backgroundColor: colors.white,
+  },
+  itemText: {
+    fontSize: 14,
+    color: colors.dark,
   },
   icon: {
     marginRight: 5,

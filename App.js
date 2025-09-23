@@ -17,6 +17,7 @@ import Profile from './screens/Profile';
 import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
+import AttendanceSummary from './screens/AttendanceSummary';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from './utils/notifications';
 import { api, getTeacherId } from './utils/api';
@@ -219,6 +220,17 @@ export default function App() {
                   component={MarksLists}
                   options={{
                     title: 'Marks List',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="AttendanceSummary"
+                  component={AttendanceSummary}
+                  options={{
+                    title: 'Attendance Summary',
                     headerStyle: { backgroundColor: '#eee' },
                     headerTintColor: '#111',
                     headerTextAlign: 'center',
