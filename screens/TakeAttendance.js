@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TouchableOpacity, TextInput, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { api, getTeacherId } from '../utils/api';
 
 
 export default function TakeAttendance() {
@@ -43,20 +43,15 @@ export default function TakeAttendance() {
             if (!classId) {
                 alert('Invalid classId or groupId');
             }
-            const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`);
+            const res = await api.get(`/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`);
             setData(res.data);
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError("An unexpected error occurred");
-                } else if (error.request) {
-                    setError("Network error - please check your connection");
-                } else {
-                    setError("An unexpected error occurred");
-                }
+            if (error.response) {
+                console.log("Response error:", error.response.status);
+            } else if (error.request) {
+                console.log("Network error - please check your connection");
             } else {
-                // setError(error);
-                console.log(error);
+                console.log("An unexpected error occurred:", error);
             }
         } finally {
             setLoading(false);
@@ -97,28 +92,17 @@ export default function TakeAttendance() {
 
     const handleSubmit = async () => {
         try {
-            const token = await AsyncStorage.getItem('token');
             setProccessing(true);
             const studentRecords = data.map((student) => ({
                 studentId: student.id,
                 status: selectedStudents.includes(student.id) ? "Present" : "Absent",
             }));
 
-            // console.log("Student Records", studentRecords);
-            // console.log("Attendance ID", attendanceId);
             // Submit attendance data
-            const response = await axios.post(
-                `https://sjsc-backend-production.up.railway.app/api/v1/attendance/take/attendance`,
-                {
-                    attendanceId: attendanceId,
-                    studentRecords,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await api.post('/attendance/take/attendance', {
+                attendanceId: attendanceId,
+                studentRecords,
+            });
 
             if (response.status === 201) {
                 alert("Attendance recorded successfully!");

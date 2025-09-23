@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { api, getTeacherId } from '../utils/api';
 
 
 export default function EditMarks() {
@@ -30,8 +30,7 @@ export default function EditMarks() {
 
     async function fetchTeacherId() {
         try {
-
-            const teacher_id = await AsyncStorage.getItem('teacher-id');
+            const teacher_id = await getTeacherId();
             setTeacherId(teacher_id);
         }
         catch (error) {
@@ -42,11 +41,8 @@ export default function EditMarks() {
     const fetchStudents = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(
-                `https://sjsc-backend-production.up.railway.app/api/v1/marks?marksId=${markId}`,
-                // `http://192.168.0.108:3000/api/v1/marks?marksId=${markId}`
-            );
-            // console.log(res.data.marksReport.Marks);
+            const res = await api.get(`/marks?marksId=${markId}`);
+            
             const students = res.data.marksReport.Marks;
 
             // Initialize marks state with existing values
@@ -91,9 +87,7 @@ export default function EditMarks() {
             },
         }));
         try {
-            const rs = await axios.put(
-                `https://sjsc-backend-production.up.railway.app/api/v1/marks/update-marks/${markId}`, {
-                // `http://192.168.0.108:3000/api/v1/marks/update-marks/${markId}`, {
+            const rs = await api.put(`/marks/update-marks/${markId}`, {
                 studentId: studentId,
                 teacherId: teacher_id,
                 [field]: value || 0,
@@ -106,9 +100,8 @@ export default function EditMarks() {
 
         } catch (e) {
             // log the error to console
-            console.log(e.response.data.error);
-
-            alert(`${e.response.data.error}`);
+            console.log(e.response?.data?.error);
+            alert(`${e.response?.data?.error || 'Error updating marks'}`);
         }
     };
 

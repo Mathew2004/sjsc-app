@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import api from '../utils/api';
 
 
 const TeacherDropdownForm = () => {
@@ -103,15 +104,7 @@ const TeacherDropdownForm = () => {
         const fetchTeacherData = async () => {
             try {
                 const Tid = await AsyncStorage.getItem('teacher-id');
-                const res = await axios.get(
-                    `https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${Tid}`,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+                const res = await api.get(`/teachers/fetch/${Tid}`);
                 setTeacherData(res.data.teacher);
                 setLoading(false);
 

@@ -17,16 +17,15 @@ import {
 import { Avatar, ListItem, Icon } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-// import { LinearGradient } from 'expo-linear-gradient';
+import { api } from '../utils/api';
 
 const { width } = Dimensions.get('window');
 
 
 const fetchTeachers = async (signal) => {
     try {
-        const response = await fetch("https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch", { signal });
-        const data = await response.json();
-        return Array.isArray(data?.teachers) ? data.teachers : [];
+        const response = await api.get("/teachers/fetch");
+        return Array.isArray(response.data?.teachers) ? response.data.teachers : [];
     } catch (error) {
         if (error.name === "AbortError") {
             console.log("Request was aborted");

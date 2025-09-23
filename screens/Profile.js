@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Animated, Dimensions, ActivityIndicator, Image, Modal } from "react-native";
-import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { api, getTeacherId } from '../utils/api';
 
 const UpdateProfileForm = ({ setValue }) => {
     const navigation = useNavigation();
@@ -61,25 +61,16 @@ const UpdateProfileForm = ({ setValue }) => {
     const getTeacher = async () => {
         try {
             setLoading(true);
-            const teacher_id = await AsyncStorage.getItem('teacher-id');
-            const token = await AsyncStorage.getItem('token');
-            const response = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${teacher_id}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const teacher_id = await getTeacherId();
+            const response = await api.get(`/teachers/fetch/${teacher_id}`);
 
             if (response.status === 200) {
                 const { name, email, phone, password, extra } = response.data.teacher;
-                // const { name, email, phone, password, profileImage } = response.data.teacher;
                 setName(name);
                 setEmail(email);
                 setPhone(phone);
                 setPassword(password);
                 setProfileImage(extra?.image || null);
-                // setDept(extra?.dept || "");
-                // setPositionValue(extra?.position || "");
             }
         } catch (error) {
             console.error("Error fetching teacher data:", error);
@@ -110,18 +101,8 @@ const UpdateProfileForm = ({ setValue }) => {
 
         try {
             setSubmitting(true);
-            const teacher_id = await AsyncStorage.getItem('teacher-id');
-            const token = await AsyncStorage.getItem('token');
-            const response = await axios.put(
-                `https://sjsc-backend-production.up.railway.app/api/v1/teachers/update-info/${teacher_id}`,
-                data,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const teacher_id = await getTeacherId();
+            const response = await api.put(`/teachers/update-info/${teacher_id}`, data);
 
             if (response.status === 200) {
                 alert("Profile updated successfully");
@@ -199,21 +180,11 @@ const UpdateProfileForm = ({ setValue }) => {
                         name: 'profile.jpg',
                     });
 
-                    // Get teacher ID and token
-                    const teacher_id = await AsyncStorage.getItem('teacher-id');
-                    const token = await AsyncStorage.getItem('token');
+                    // Get teacher ID
+                    const teacher_id = await getTeacherId();
 
                     // Upload image to server
-                    const uploadResponse = await axios.post(
-                        `https://sjsc-backend-production.up.railway.app/api/v1/teachers/upload-image/${teacher_id}`,
-                        formData,
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                                Authorization: `Bearer ${token}`,
-                            },
-                        }
-                    );
+                    const uploadResponse = await api.upload(`/teachers/upload-image/${teacher_id}`, formData);
                     
                     if (uploadResponse.status === 200) {
                         const imageUrl = uploadResponse.data.imageUrl || result.assets[0].uri;
@@ -261,21 +232,11 @@ const UpdateProfileForm = ({ setValue }) => {
                                 name: 'profile.jpg',
                             });
 
-                            // Get teacher ID and token
-                            const teacher_id = await AsyncStorage.getItem('teacher-id');
-                            const token = await AsyncStorage.getItem('token');
+                            // Get teacher ID
+                            const teacher_id = await getTeacherId();
 
                             // Upload image to server
-                            const uploadResponse = await axios.post(
-                                `https://sjsc-backend-production.up.railway.app/api/v1/teachers/upload-image/${teacher_id}`,
-                                formData,
-                                {
-                                    headers: {
-                                        'Content-Type': 'multipart/form-data',
-                                        Authorization: `Bearer ${token}`,
-                                    },
-                                }
-                            );
+                            const uploadResponse = await api.upload(`/teachers/upload-image/${teacher_id}`, formData);
                             
                             console.log('Upload response:', uploadResponse.data);
                             if (uploadResponse.status === 200) {

@@ -43,7 +43,8 @@
     "extra": {
       "eas": {
         "projectId": "9786032b-12bf-4ebb-ad57-96e34ae96fbb"
-      }
+      },
+      "API": "https://sjsc-backend-production.up.railway.app/api/v1"
     },
     "plugins": [
       [

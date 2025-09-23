@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import { api, getTeacherId, getToken } from '../utils/api';
 
 export const useTeacher = () => {
     const [teacher, setTeacher] = useState(null);
@@ -16,15 +16,7 @@ export const useTeacher = () => {
             setLoading(true);
             setError(null);
             
-            const response = await axios.get(
-                `https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${id}`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                }
-            );
+            const response = await api.get(`/teachers/fetch/${id}`);
 
             if (response.status === 200 && response.data.teacher) {
                 setTeacher(response.data.teacher);
@@ -45,8 +37,8 @@ export const useTeacher = () => {
     useEffect(() => {
         const initializeTeacher = async () => {
             try {
-                const storedToken = await AsyncStorage.getItem('token');
-                const storedTeacherId = await AsyncStorage.getItem('teacher-id');
+                const storedToken = await getToken();
+                const storedTeacherId = await getTeacherId();
                 
                 setToken(storedToken);
                 setTeacherId(storedTeacherId);

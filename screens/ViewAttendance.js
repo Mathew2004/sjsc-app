@@ -10,11 +10,11 @@ import {
     Animated,
     Dimensions,
 } from "react-native";
-import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
+import { api } from '../utils/api';
 
 const ViewAttendance = () => {
     const route = useRoute();
@@ -67,28 +67,15 @@ const ViewAttendance = () => {
         useCallback(() => {
             const fetchAttendanceData = async () => {
                 try {
-                    const token = await AsyncStorage.getItem("token");
-                    const response = await axios.get(
-                        `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/report/${id}`,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        }
-                    );
+                    const response = await api.get(`/attendance/fetch/report/${id}`);
                     setAttendanceData(response.data);
                 } catch (error) {
-
-                    if (axios.isAxiosError(error)) {
-                        if (error.response) {
-                            setError("An unexpected error occurred");
-                        } else if (error.request) {
-                            setError("Network error - please check your connection");
-                        } else {
-                            setError("An unexpected error occurred");
-                        }
+                    if (error.response) {
+                        setError("An unexpected error occurred");
+                    } else if (error.request) {
+                        setError("Network error - please check your connection");
                     } else {
-                        // setError(error);
+                        setError("An unexpected error occurred");
                         console.log(error);
                     }
                 } finally {

@@ -8,6 +8,7 @@ import { Icon } from 'react-native-elements';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from '@expo/vector-icons';
+import api from '../utils/api';
 
 const AttendanceReport = () => {
   const navigation = useNavigation();
@@ -65,9 +66,11 @@ const AttendanceReport = () => {
       const Tid = await AsyncStorage.getItem('teacher-id');
       if (!Tid) throw new Error('Teacher ID not found');
 
-      const res = await axios.get(
-        `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
-      );
+      // const res = await axios.get(
+      //   `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
+      // );
+      const res = await api.get(`/attendance/fetch/teacher-report/${Tid}`);
+
 
       const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
       setAttendanceData(sortedData);

@@ -4,8 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
-import axios from 'axios';
 import { useTeacher } from '../hooks';
+import { api } from '../utils/api';
 
 
 
@@ -116,9 +116,7 @@ export default function HomeScreen() {
     const fetchNotices = async () => {
         try {
             setLoadingNotices(true);
-            const res = await axios.get(
-                `https://sjsc-backend-production.up.railway.app/api/v1/notices/fetch`
-            );
+            const res = await api.get('/notices/fetch');
             console.log('API Response:', res.data);
             const data = res.data.data || [];
             console.log('Notices data:', data);

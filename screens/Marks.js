@@ -9,12 +9,12 @@ import {
     Dimensions
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from '@expo/vector-icons';
+import { api, getTeacherId } from '../utils/api';
 
 const Marks = () => {
     const navigation = useNavigation();
@@ -101,11 +101,8 @@ const Marks = () => {
     useEffect(() => {
         const fetchTeacherData = async () => {
             try {
-                const Tid = await AsyncStorage.getItem('teacher-id');
-                const res = await axios.get(
-                    // `http://192.168.0.103:3000/api/v1/teachers/fetch/${Tid}`
-                    `https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${Tid}`
-                );
+                const Tid = await getTeacherId();
+                const res = await api.get(`/teachers/fetch/${Tid}`);
                 setTeacherData(res.data.teacher);
                 setLoading(false);
 
@@ -135,8 +132,7 @@ const Marks = () => {
 
         const fetchExams = async () => {
             try {
-                const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/exam`);
-                // console.log(res.data.exams);
+                const res = await api.get('/exam');
                 setExamItems(res.data.exams.map(exam => ({
                     label: exam.name,
                     classId: exam.Class.id,
@@ -205,8 +201,7 @@ const Marks = () => {
         try {
             if(!examValue) return alert("Please select an exam");
             if(!subjectValue) return alert("Please select a subject");
-            const Tid = await AsyncStorage.getItem("teacher-id");
-            const token = await AsyncStorage.getItem("token");
+            const Tid = await getTeacherId();
             const payload = {
                 teacherId: parseInt(Tid),
                 classId: classValue || null,
@@ -220,17 +215,7 @@ const Marks = () => {
             // console.log(payload);
 
             setSubmitting(true);
-            const response = await axios.post(
-                `https://sjsc-backend-production.up.railway.app/api/v1/marks/create-report`,
-                // `http://192.168.0.103:3000/api/v1/marks/create-report`,
-                { ...payload },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await api.post('/marks/create-report', { ...payload });
 
             if (response.data.status == "success") {
                 navigation.navigate("TakeMarks", {

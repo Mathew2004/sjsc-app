@@ -19,7 +19,7 @@ import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from './utils/notifications';
-import axios from 'axios';
+import { api, getTeacherId } from './utils/api';
 
 
 const Stack = createNativeStackNavigator();
@@ -34,19 +34,16 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const token = await AsyncStorage.getItem("token");
-      const teacher_id = await AsyncStorage.getItem("teacher-id");
+      const teacher_id = await getTeacherId();
       const fcmToken = await registerForPushNotificationsAsync();
+      
       // send token to your backend
-      await axios.post(
-        `https://sjsc-backend-production.up.railway.app/api/v1/save-fcm-token`,
-        {
+      if (token && teacher_id && fcmToken) {
+        await api.post('/save-fcm-token', {
           fcmToken: fcmToken,
           teacher_id: teacher_id
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        });
+      }
 
     })();
 

@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { api } from '../utils/api';
 
 export default function TakeMarks() {
     const navigation = useNavigation();
@@ -39,9 +39,7 @@ export default function TakeMarks() {
     const fetchStudents = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(
-                `https://sjsc-backend-production.up.railway.app/api/v1/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`
-            );
+            const res = await api.get(`/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`);
             setData(res.data);
             setFilteredData(res.data);
         } catch (error) {
@@ -79,18 +77,10 @@ export default function TakeMarks() {
                 teacherId: marks[student.id]?.teacherId || null,
             }));
 
-            const response = await axios.post(
-                `https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks`,
-                // `http://192.168.0.108:3000/api/v1/marks/take-marks`,
-                {
-                    marksId: markId,
-                    records: studentRecords,
-
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const response = await api.post('/marks/take-marks', {
+                marksId: markId,
+                records: studentRecords,
+            });
 
             if (response.status === 200) {
                 alert('Marks recorded successfully!');

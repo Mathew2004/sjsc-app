@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ActivityIndicator, Animated, Dimensions } from "react-native";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import { Ionicons } from '@expo/vector-icons';
+import { api } from '../../utils/api';
 
 
 const LoginScreen = ({ setValue }) => {
@@ -75,18 +75,8 @@ const LoginScreen = ({ setValue }) => {
 
             console.log(payload);
 
-            // Add timeout configuration
-            const res = await axios.post(
-                "https://sjsc-backend-production.up.railway.app/api/v1/auth/teacher-login",
-                // "http://192.168.0.103:3000/api/v1/auth/teacher-login",
-                payload,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    timeout: 5000,
-                }
-            );
+            // Use the simplified API call
+            const res = await api.post("/auth/teacher-login", payload);
 
             setLoading(false);
 
@@ -94,27 +84,22 @@ const LoginScreen = ({ setValue }) => {
                 const id = res.data.data.id;
                 await AsyncStorage.setItem("token", res.data.token);
                 await AsyncStorage.setItem("teacher-id", id.toString());
-                // navigation.navigate("Home");
                 setValue(res.data.token);
             }
         } catch (error) {
             setLoading(false);
 
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    if (error.response.status === 401) {
-                        setError("Invalid username or password");
-                    } else {
-                        console.log(error);
-                        setError(`Server error: ${error.response.status}`);
-                    }
-                } else if (error.request) {
-                    setError("Network error - please check your connection");
+            if (error.response) {
+                if (error.response.status === 401) {
+                    setError("Invalid username or password");
                 } else {
-                    setError("An unexpected error occurred");
+                    console.log(error);
+                    setError(`Server error: ${error.response.status}`);
                 }
+            } else if (error.request) {
+                setError("Network error - please check your connection");
             } else {
-                // setError(error);
+                setError("An unexpected error occurred");
                 console.log(error);
             }
         }

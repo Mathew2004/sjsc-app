@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import api from '../utils/api';
 
 const { width } = Dimensions.get('window');
 
@@ -21,11 +22,7 @@ const MarksList = ({ navigation }) => {
                     const Tid = await AsyncStorage.getItem('teacher-id');
                     if (!Tid) throw new Error("Teacher ID not found");
 
-                    const res = await axios.get(
-                        // `http://192.168.0.103:3000/api/v1/marks/all-reports?teacherId=${Tid}`,
-                        `https://sjsc-backend-production.up.railway.app/api/v1/marks/all-reports?teacherId=${Tid}`,
-                        { signal: controller.signal }
-                    );
+                    const res = await api.get(`/marks/all-reports?teacherId=${Tid}`, { signal: controller.signal });
 
                     setMarksData(res.data.marksReport);
                 } catch (error) {
