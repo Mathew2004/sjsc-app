@@ -18,6 +18,7 @@ import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
 import MarksLists from './screens/MarksList';
 import AttendanceSummary from './screens/AttendanceSummary';
+import StudentAttendanceCalendar from './screens/StudentAttendanceCalendar';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from './utils/notifications';
 import { api, getTeacherId } from './utils/api';
@@ -235,6 +236,19 @@ export default function App() {
                     headerTintColor: '#111',
                     headerTextAlign: 'center',
                     detachPreviousScreen: false,
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="StudentAttendanceCalendar"
+                  component={StudentAttendanceCalendar}
+                  options={{
+                    title: 'Student Calendar',
+                    headerStyle: { backgroundColor: '#eee' },
+                    headerTintColor: '#111',
+                    headerTextAlign: 'center',
+                    detachPreviousScreen: false,
+                    headerShown: false,
                   }}
                 />
                 {/* <Stack.Screen

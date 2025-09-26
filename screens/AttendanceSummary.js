@@ -77,7 +77,7 @@ const AttendanceSummary = ({ navigation }) => {
             const result = response.data;
             setAttendanceData(result.data || []);
             setSummaryData(result.summary || null);
-            Alert.alert("Success", "Attendance summary loaded successfully");
+            // Alert.alert("Success", "Attendance summary loaded successfully");
         } catch (error) {
             console.error("Error fetching attendance summary:", error);
             Alert.alert("Error", "Failed to fetch attendance summary");
@@ -139,7 +139,7 @@ const AttendanceSummary = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
-            
+
             <ScrollView
                 style={styles.scrollView}
                 refreshControl={
@@ -155,13 +155,19 @@ const AttendanceSummary = ({ navigation }) => {
                     end={{ x: 1, y: 1 }}
                 >
                     <View style={styles.headerContent}>
+                        <TouchableOpacity
+                            style={styles.backButton}
+                            onPress={() => navigation.goBack()}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="white" />
+                        </TouchableOpacity>
                         <View style={styles.headerText}>
                             <Text style={styles.headerTitle}>Attendance Summary</Text>
                             <Text style={styles.headerSubtitle}>Monitor student attendance patterns</Text>
                         </View>
-                        <View style={styles.headerIcon}>
+                        {/* <View style={styles.headerIcon}>
                             <Ionicons name="analytics" size={28} color="rgba(255,255,255,0.9)" />
-                        </View>
+                        </View> */}
                     </View>
                 </LinearGradient>
 
@@ -186,7 +192,7 @@ const AttendanceSummary = ({ navigation }) => {
                         <Ionicons name="calendar-outline" size={20} color={colors.primary} />
                         <Text style={styles.dateTitle}>Date Range</Text>
                     </View>
-                    
+
                     <View style={styles.dateRow}>
                         <View style={styles.dateColumn}>
                             <Text style={styles.dateLabel}>Start Date</Text>
@@ -246,7 +252,7 @@ const AttendanceSummary = ({ navigation }) => {
                 {summaryData && !loading && (
                     <View style={styles.summaryContainer}>
                         <Text style={styles.sectionTitle}>Overview</Text>
-                        
+
                         <View style={styles.summaryGrid}>
                             {/* Total Days Card */}
                             <LinearGradient
@@ -278,7 +284,7 @@ const AttendanceSummary = ({ navigation }) => {
                         </View>
 
                         {/* Teacher Info Card */}
-                        <View style={styles.teacherCard}>
+                        {/* <View style={styles.teacherCard}>
                             <View style={styles.teacherIcon}>
                                 <Ionicons name="person-outline" size={20} color={colors.primary} />
                             </View>
@@ -288,7 +294,7 @@ const AttendanceSummary = ({ navigation }) => {
                                     {getTeacherName(summaryData?.reportInfo?.teacherId)}
                                 </Text>
                             </View>
-                        </View>
+                        </View> */}
                     </View>
                 )}
 
@@ -297,80 +303,40 @@ const AttendanceSummary = ({ navigation }) => {
                     <View style={styles.listContainer}>
                         <Text style={styles.sectionTitle}>Student Attendance</Text>
                         {attendanceData.map((student, index) => (
-                            <View key={student.studentId || index} style={styles.studentCard}>
-                                <View style={styles.studentHeader}>
+                            <TouchableOpacity
+                                key={student.studentId || index}
+                                style={styles.studentCard}
+                                onPress={() => navigation.navigate('StudentAttendanceCalendar', {
+                                    studentId: student.studentId || student.id
+                                })}
+                                activeOpacity={0.7}
+                            >
+                                <View style={styles.studentRow}>
                                     <View style={styles.studentInfo}>
                                         <Text style={styles.studentName}>{student.name}</Text>
                                         <Text style={styles.studentRoll}>Roll: {student.roll}</Text>
                                     </View>
-                                    
-                                    <View style={styles.percentageContainer}>
-                                        <Text
-                                            style={[
-                                                styles.percentageText,
-                                                { color: getAttendanceColor(student.attendancePercentage) }
-                                            ]}
-                                        >
-                                            {student.attendancePercentage}%
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.statusText,
-                                                { color: getAttendanceColor(student.attendancePercentage) }
-                                            ]}
-                                        >
-                                            {getAttendanceStatus(student.attendancePercentage)}
-                                        </Text>
-                                    </View>
-                                </View>
-                                
-                                <View style={styles.attendanceStats}>
-                                    <View style={styles.statItem}>
-                                        <View style={[styles.statIcon, { backgroundColor: colors.success + '20' }]}>
-                                            <Ionicons name="checkmark" size={14} color={colors.success} />
-                                        </View>
-                                        <Text style={styles.statLabel}>Present</Text>
-                                        <Text style={[styles.statValue, { color: colors.success }]}>
-                                            {student.present}
-                                        </Text>
-                                    </View>
-                                    
-                                    <View style={styles.statItem}>
-                                        <View style={[styles.statIcon, { backgroundColor: colors.danger + '20' }]}>
-                                            <Ionicons name="close" size={14} color={colors.danger} />
-                                        </View>
-                                        <Text style={styles.statLabel}>Absent</Text>
-                                        <Text style={[styles.statValue, { color: colors.danger }]}>
-                                            {student.absent}
-                                        </Text>
-                                    </View>
-                                    
-                                    <View style={styles.statItem}>
-                                        <View style={[styles.statIcon, { backgroundColor: colors.info + '20' }]}>
-                                            <Ionicons name="calendar" size={14} color={colors.info} />
-                                        </View>
-                                        <Text style={styles.statLabel}>Total</Text>
-                                        <Text style={[styles.statValue, { color: colors.info }]}>
-                                            {student.total}
-                                        </Text>
-                                    </View>
-                                </View>
 
-                                {/* Progress Bar */}
-                                <View style={styles.progressContainer}>
-                                    <View style={styles.progressBar}>
-                                        <View
-                                            style={[
-                                                styles.progressFill,
-                                                {
-                                                    width: `${student.attendancePercentage}%`,
-                                                    backgroundColor: getAttendanceColor(student.attendancePercentage)
-                                                }
-                                            ]}
-                                        />
+                                    <View style={styles.attendanceInfo}>
+                                        <Text style={styles.attendanceStats}>
+                                            <Text style={[styles.statText, { color: colors.success }]}>P:{student.present}</Text>
+                                            <Text style={styles.statSeparator}> • </Text>
+                                            <Text style={[styles.statText, { color: colors.danger }]}>A:{student.absent}</Text>
+                                        </Text>
+                                        <View style={styles.percentageContainer}>
+                                            <Text
+                                                style={[
+                                                    styles.percentageText,
+                                                    { color: getAttendanceColor(student.attendancePercentage) }
+                                                ]}
+                                            >
+                                                {student.attendancePercentage}%
+                                            </Text>
+                                            <Ionicons name="chevron-forward" size={16} color={colors.gray[400]} />
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         ))}
                     </View>
                 ) : (
@@ -413,18 +379,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: 16,
     },
     headerText: {
         flex: 1,
     },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 20,
         fontWeight: 'bold',
         color: 'white',
         marginBottom: 4,
     },
     headerSubtitle: {
-        fontSize: 16,
+        fontSize: 12,
         color: 'rgba(255,255,255,0.9)',
         fontWeight: '400',
     },
@@ -591,92 +558,60 @@ const styles = StyleSheet.create({
     },
     studentCard: {
         backgroundColor: 'white',
-        marginBottom: 12,
-        padding: 16,
-        borderRadius: 12,
+        marginBottom: 8,
+        padding: 12,
+        borderRadius: 8,
         borderWidth: 1,
         borderColor: colors.gray[100],
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.03,
+        shadowRadius: 2,
+        elevation: 1,
     },
-    studentHeader: {
+    studentRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 16,
+        alignItems: 'center',
     },
     studentInfo: {
         flex: 1,
     },
     studentName: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '600',
         color: colors.dark,
         marginBottom: 2,
     },
     studentRoll: {
-        fontSize: 12,
-        color: colors.gray[600],
+        fontSize: 11,
+        color: colors.gray[500],
         fontWeight: '500',
+    },
+    attendanceInfo: {
+        alignItems: 'flex-end',
+    },
+    attendanceStats: {
+        fontSize: 12,
+        marginBottom: 3,
+    },
+    statText: {
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    statSeparator: {
+        color: colors.gray[400],
+        fontSize: 12,
     },
     percentageContainer: {
         alignItems: 'flex-end',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
     },
     percentageText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 2,
-    },
-    statusText: {
-        fontSize: 11,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    attendanceStats: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-    },
-    statItem: {
-        alignItems: 'center',
-        flex: 1,
-    },
-    statIcon: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 6,
-    },
-    statLabel: {
-        fontSize: 11,
-        color: colors.gray[600],
-        fontWeight: '500',
-        marginBottom: 2,
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    statValue: {
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    progressContainer: {
-        marginTop: 4,
-    },
-    progressBar: {
-        height: 6,
-        backgroundColor: colors.gray[200],
-        borderRadius: 3,
-        overflow: 'hidden',
-    },
-    progressFill: {
-        height: '100%',
-        borderRadius: 3,
     },
     emptyContainer: {
         alignItems: 'center',

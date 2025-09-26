@@ -8,7 +8,8 @@ import {
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from '@expo/vector-icons';
-import { api } from "../utils/api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api, getTeacherId } from "../utils/api";
 import { colors } from "../utils/colors";
 
 const Filter = ({
@@ -25,6 +26,10 @@ const Filter = ({
     handleSearch,
 }) => {
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const [teacherData, setTeacherData] = useState(null);
 
     // Dropdown states
     const [levelOpen, setLevelOpen] = useState(false);
@@ -35,13 +40,10 @@ const Filter = ({
 
     // Dropdown items
     const [levelItems, setLevelItems] = useState([
-        { label: 'School', value: 'School' },
-        { label: 'College', value: 'College' },
+        { label: 'School', value: 'school' },
+        { label: 'College', value: 'college' },
     ]);
-    const [shiftItems, setShiftItems] = useState([
-        { label: 'Morning', value: 'Morning' },
-        { label: 'Day', value: 'Noon' },
-    ]);
+    const [shiftItems, setShiftItems] = useState([]);
     const [classItems, setClassItems] = useState([]);
     const [sectionItems, setSectionItems] = useState([]);
     const [groupItems, setGroupItems] = useState([]);
@@ -62,90 +64,70 @@ const Filter = ({
         setGroup("");
         setSectionItems([]);
         setGroupItems([]);
-        updateSectionItems();
     }, [classId]);
 
-    // Fetch classes from the API
-    const fetchClasses = async () => {
-        try {
-            const response = await api.get('/settings/fetch/class');
-            const classes = response.data.data || [];
-            setData(classes);
-            updateClassItems(classes);
-        } catch (error) {
-            console.error("Error fetching classes:", error);
-            Alert.alert("Error", "Failed to fetch classes");
-        }
-    };
 
-    // Update class items based on level filter
-    const updateClassItems = (classes = data) => {
-        let filteredClasses = classes;
-        if (level) {
-            filteredClasses = classes.filter((cls) => cls.level === level);
-        }
-        
-        setClassItems([
-            { label: 'All Classes', value: '' },
-            ...filteredClasses.map((cls) => ({
-                label: cls.name,
-                value: cls.id,
-            }))
-        ]);
-    };
-
-    // Update section items when class is selected
-    const updateSectionItems = () => {
-        if (!classId) {
-            setSectionItems([]);
-            return;
-        }
-
-        const selectedClass = data.find((cls) => cls.id == classId);
-        if (selectedClass && selectedClass.Sections) {
-            setSectionItems([
-                { label: 'All Sections', value: '' },
-                ...selectedClass.Sections.map((sec) => ({
-                    label: sec.name,
-                    value: sec.id,
-                }))
-            ]);
-        }
-    };
-
-    // Update group items when class is selected
-    const updateGroupItems = () => {
-        if (!classId) {
-            setGroupItems([]);
-            return;
-        }
-
-        const selectedClass = data.find((cls) => cls.id == classId);
-        if (selectedClass && selectedClass.Groups) {
-            setGroupItems([
-                { label: 'All Groups', value: '' },
-                ...selectedClass.Groups.map((grp) => ({
-                    label: grp.name,
-                    value: grp.id,
-                }))
-            ]);
-        }
-    };
-
-    // Update items when data or filters change
+    // Fetch Teacher Data
     useEffect(() => {
-        updateClassItems();
-    }, [level, data]);
+        const fetchTeacherData = async () => {
+            try {
+                const Tid = await AsyncStorage.getItem('teacher-id');
+                const res = await api.get(`/teachers/fetch/${Tid}`);
+                setTeacherData(res.data.teacher);
+                setLoading(false);
 
-    useEffect(() => {
-        updateSectionItems();
-        updateGroupItems();
-    }, [classId, data]);
+                // Set Class Items with proper level mapping
+                const classes = res.data.teacher.assignedClasses?.map(cls => ({
+                    label: cls.name,
+                    level: cls.level,
+                    value: cls.id,
+                })) || [];
+                setClassItems(classes);
+                
+                // Set Shift Items from teacher's assigned shifts
+                const shifts = res.data.teacher.assignedShift?.map(shift => ({
+                    label: shift,
+                    value: shift,
+                })) || [];
+                setShiftItems(shifts);
+            } catch (error) {
+                console.error('Error fetching teacher data:', error);
+                setLoading(false);
+            }
+        };
 
-    // Fetch classes on component mount
-    useEffect(() => {
-        fetchClasses();
+        fetchTeacherData();
     }, []);
+
+
+    useEffect(() => {
+        if (classId && teacherData) {
+            const groups = teacherData.assignedGroups
+                ?.filter(group => group.Class.id === classId)
+                ?.map(group => ({
+                    label: group.name,
+                    value: group.id,
+                }));
+            setGroupItems(groups);
+            setGroup("");
+            setSection("");
+        }
+    }, [classId, teacherData]);
+
+
+    // Update Section Items when Class is selected
+    useEffect(() => {
+        if (classId && teacherData) {
+            const sections = teacherData.assignedSections
+                ?.filter(section => section.Class.id === classId)
+                ?.map(section => ({
+                    label: section.name,
+                    value: section.id,
+                }));
+            setSectionItems(sections);
+            setSection("");
+        }
+    }, [classId, teacherData]);
 
     // Reset all filters
     const resetFilters = () => {
@@ -172,7 +154,7 @@ const Filter = ({
                 <Ionicons name="filter" size={20} color={colors.primary} />
                 <Text style={styles.title}>Filters</Text>
             </View>
-            
+
             {/* Filters in wrap layout */}
             <View style={styles.filtersContainer}>
                 {/* Level Filter */}
@@ -197,7 +179,7 @@ const Filter = ({
                 </View>
 
                 {/* Shift Filter (only for School level) */}
-                {level === "School" && (
+                {level === "school" && (
                     <View style={styles.filterItem}>
                         <Text style={styles.label}>Shift</Text>
                         <DropDownPicker
@@ -224,23 +206,22 @@ const Filter = ({
                     <DropDownPicker
                         open={classOpen}
                         value={classId}
-                        items={classItems}
+                        items={classItems.filter(item => item.level?.toLowerCase() === level?.toLowerCase())}
                         setOpen={setClassOpen}
                         setValue={setClass}
                         setItems={setClassItems}
-                        onChangeValue={handleClassChange}
-                        placeholder="Class"
-                        style={styles.dropdown}
+                        placeholder="📚 Select Class"
+                        style={[styles.dropdown, !level && styles.disabledDropdown]}
                         textStyle={styles.dropdownText}
-                        placeholderStyle={styles.placeholderText}
-                        dropDownContainerStyle={styles.dropdownContainer}
+                        disabled={!level}
                         zIndex={3000}
-                        zIndexInverse={3000}
+                        listMode="SCROLLVIEW"
+                        dropDownContainerStyle={styles.dropdownContainer}
                     />
                 </View>
 
                 {/* Section Filter (only if a class is selected) */}
-                {classId && sectionItems.length > 1 && (
+                {classId && sectionItems.length > 0 && (
                     <View style={styles.filterItem}>
                         <Text style={styles.label}>Section</Text>
                         <DropDownPicker
@@ -251,9 +232,10 @@ const Filter = ({
                             setValue={setSection}
                             setItems={setSectionItems}
                             placeholder="Section"
-                            style={styles.dropdown}
+                            style={[styles.dropdown, !classId && styles.disabledDropdown]}
                             textStyle={styles.dropdownText}
                             placeholderStyle={styles.placeholderText}
+                            disabled={!classId}
                             dropDownContainerStyle={styles.dropdownContainer}
                             zIndex={2000}
                             zIndexInverse={4000}
@@ -262,7 +244,7 @@ const Filter = ({
                 )}
 
                 {/* Group Filter (only if a class is selected) */}
-                {classId && groupItems.length > 1 && (
+                {classId && groupItems.length > 0 && (
                     <View style={styles.filterItem}>
                         <Text style={styles.label}>Group</Text>
                         <DropDownPicker
@@ -273,9 +255,10 @@ const Filter = ({
                             setValue={setGroup}
                             setItems={setGroupItems}
                             placeholder="Group"
-                            style={styles.dropdown}
+                            style={[styles.dropdown, !classId && styles.disabledDropdown]}
                             textStyle={styles.dropdownText}
                             placeholderStyle={styles.placeholderText}
+                            disabled={!classId}
                             dropDownContainerStyle={styles.dropdownContainer}
                             zIndex={1000}
                             zIndexInverse={5000}
@@ -287,16 +270,16 @@ const Filter = ({
             {/* Action Buttons */}
             {handleSearch && (
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={styles.searchButton} 
+                    <TouchableOpacity
+                        style={styles.searchButton}
                         onPress={handleSearch}
                     >
                         <Ionicons name="search" size={18} color={colors.white} />
                         <Text style={styles.searchButtonText}>Search</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                        style={styles.resetButton} 
+
+                    <TouchableOpacity
+                        style={styles.resetButton}
                         onPress={resetFilters}
                     >
                         <Ionicons name="refresh" size={18} color={colors.gray[600]} />
@@ -360,6 +343,10 @@ const styles = StyleSheet.create({
         minHeight: 44,
         backgroundColor: colors.gray[50],
         paddingHorizontal: 12,
+    },
+    disabledDropdown: {
+        backgroundColor: 'rgba(248, 250, 252, 0.8)',
+        borderColor: 'rgba(148, 163, 184, 0.3)',
     },
     dropdownContainer: {
         borderColor: colors.gray[200],
