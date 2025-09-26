@@ -9,7 +9,7 @@ import { api, getTeacherId } from '../utils/api';
 export default function TakeAttendance() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { classId, groupId, sectionId, shift, attendanceId } = route.params || {};
+    const { classId, groupId, sectionId, shift, attendanceId, sort } = route.params || {};
 
     // Animation refs
     const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -18,7 +18,7 @@ export default function TakeAttendance() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedStudents, setSelectedStudents] = useState([]);
-    const [searchText, setSearchText] = useState(""); 
+    const [searchText, setSearchText] = useState("");
     const [proccessing, setProccessing] = useState(false);
 
     // Animation setup
@@ -43,7 +43,7 @@ export default function TakeAttendance() {
             if (!classId) {
                 alert('Invalid classId or groupId');
             }
-            const res = await api.get(`/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`);
+            const res = await api.get(`/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}&sort=${sort || ''}`);
             setData(res.data);
         } catch (error) {
             if (error.response) {
@@ -64,9 +64,13 @@ export default function TakeAttendance() {
 
     const filteredData = useMemo(() => {
         if (!searchText.trim()) return data;
-        return data.filter((item) =>
-            item.roll == (searchText.trim())
-        );
+        return data.filter((item) => {
+            if (sort == "sid") {
+                return item.sid == (searchText.trim());
+            } else {
+                return item.roll == (searchText.trim());
+            }
+        });
     }, [data, searchText]);
 
     const ToggleStudent = (id) => {
@@ -146,14 +150,14 @@ export default function TakeAttendance() {
                         <Ionicons name="people" size={24} color="#007AFF" />
                         <Text style={styles.headerTitle}>Take Attendance</Text>
                     </View>
-                    <TouchableOpacity 
-                        style={styles.selectAllButton} 
+                    <TouchableOpacity
+                        style={styles.selectAllButton}
                         onPress={ToggleselectAll}
                     >
-                        <Ionicons 
-                            name={selectedStudents.length === data.length ? "checkbox" : "square-outline"} 
-                            size={18} 
-                            color="#007AFF" 
+                        <Ionicons
+                            name={selectedStudents.length === data.length ? "checkbox" : "square-outline"}
+                            size={18}
+                            color="#007AFF"
                         />
                         <Text style={styles.selectAllText}>
                             {selectedStudents.length === data.length ? "Deselect All" : "Select All"}
@@ -214,7 +218,7 @@ export default function TakeAttendance() {
             )}
 
             {/* Students List */}
-            <ScrollView 
+            <ScrollView
                 style={styles.studentsList}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.studentsContainer}
@@ -225,7 +229,7 @@ export default function TakeAttendance() {
                         style={[
                             styles.studentCard,
                             selectedStudents.includes(item.id) && styles.selectedCard,
-                            
+
                         ]}
                     >
                         <TouchableOpacity
@@ -236,7 +240,7 @@ export default function TakeAttendance() {
                             {/* Student Info */}
                             <View style={styles.studentInfo}>
                                 <View style={styles.rollContainer}>
-                                    <Text style={styles.rollNumber}>{item.roll}</Text>
+                                    <Text style={styles.rollNumber}>{sort == "sid" ? item.sid : item.roll}</Text>
                                 </View>
                                 <View style={styles.studentDetails}>
                                     <Text style={styles.studentName}>{item.name}</Text>
@@ -252,10 +256,10 @@ export default function TakeAttendance() {
                                     styles.statusIndicator,
                                     selectedStudents.includes(item.id) ? styles.presentIndicator : styles.absentIndicator
                                 ]}>
-                                    <Ionicons 
-                                        name={selectedStudents.includes(item.id) ? "checkmark" : "close"} 
-                                        size={16} 
-                                        color="white" 
+                                    <Ionicons
+                                        name={selectedStudents.includes(item.id) ? "checkmark" : "close"}
+                                        size={16}
+                                        color="white"
                                     />
                                 </View>
                             </View>
@@ -272,8 +276,8 @@ export default function TakeAttendance() {
                 //     transform: [{ translateY: slideAnim }],
                 // }
             ]}>
-                <TouchableOpacity 
-                    style={[styles.submitButton, proccessing && styles.submittingButton]} 
+                <TouchableOpacity
+                    style={[styles.submitButton, proccessing && styles.submittingButton]}
                     onPress={handleSubmit}
                     disabled={proccessing}
                 >

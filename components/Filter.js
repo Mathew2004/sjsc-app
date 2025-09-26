@@ -175,6 +175,7 @@ const Filter = ({
                         dropDownContainerStyle={styles.dropdownContainer}
                         zIndex={5000}
                         zIndexInverse={1000}
+                        listMode="SCROLLVIEW"
                     />
                 </View>
 
@@ -196,6 +197,7 @@ const Filter = ({
                             dropDownContainerStyle={styles.dropdownContainer}
                             zIndex={4000}
                             zIndexInverse={2000}
+                            listMode="SCROLLVIEW"
                         />
                     </View>
                 )}
@@ -210,7 +212,7 @@ const Filter = ({
                         setOpen={setClassOpen}
                         setValue={setClass}
                         setItems={setClassItems}
-                        placeholder="📚 Select Class"
+                        placeholder="Select Class"
                         style={[styles.dropdown, !level && styles.disabledDropdown]}
                         textStyle={styles.dropdownText}
                         disabled={!level}
@@ -239,6 +241,7 @@ const Filter = ({
                             dropDownContainerStyle={styles.dropdownContainer}
                             zIndex={2000}
                             zIndexInverse={4000}
+                            listMode="SCROLLVIEW"
                         />
                     </View>
                 )}
@@ -262,6 +265,7 @@ const Filter = ({
                             dropDownContainerStyle={styles.dropdownContainer}
                             zIndex={1000}
                             zIndexInverse={5000}
+                            listMode="SCROLLVIEW"
                         />
                     </View>
                 )}

@@ -651,13 +651,13 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     presentDay: {
-        backgroundColor: '#24b786df',
+        backgroundColor: '#c3efd0ff',
     },
     absentDay: {
-        backgroundColor: '#c13b3bff',
+        backgroundColor: '#fdbcbcff',
     },
     noDataDay: {
-        backgroundColor: '#f3f4f6',
+        backgroundColor: '#f3f4f667',
     },
     todayHighlight: {
         borderWidth: 2,
@@ -671,10 +671,10 @@ const styles = StyleSheet.create({
         color: '#f9fafb',
     },
     presentText: {
-        color: '#ffffff',
+        color: '#4fa167ff',
     },
     absentText: {
-        color: '#ffffff',
+        color: '#bb5757ff',
     },
     noDataText: {
         color: '#9ca3af',

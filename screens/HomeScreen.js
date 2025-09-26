@@ -32,7 +32,7 @@ const Menus = [
     },
     {
         item: 'Attendance Summary',
-        icon: require('../assets/icons/marks-history.png'),
+        icon: require('../assets/icons/summary.png'),
         href: 'AttendanceSummary',
     },
     {

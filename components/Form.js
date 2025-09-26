@@ -97,7 +97,12 @@ const TeacherDropdownForm = () => {
     const [sectionValue, setSectionValue] = useState(null);
     const [sectionItems, setSectionItems] = useState([]);
 
+    // State for Sort Dropdown
+    const [openSort, setOpenSort] = useState(false);
+
+
     const [submitting, setSubmitting] = useState(false);
+    const [sort, setSort] = useState(null);
 
     // Fetch Teacher Data
     useEffect(() => {
@@ -204,25 +209,35 @@ const TeacherDropdownForm = () => {
 
             setSubmitting(true);
 
-            const response = await axios.post(
-                // `http://192.168.0.101:3000/api/v1/attendance/create/report`,
-                `https://sjsc-backend-production.up.railway.app/api/v1/attendance/create/report`,
-                {
-                    teacherId: parseInt(Tid),
-                    classId: classValue,
-                    sectionId: sectionValue || null,
-                    groupId: groupValue || null,
-                    shift: shiftValue || null,
-                    date,
-                    remarks: "",
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            // const response = await axios.post(
+            //     // `http://192.168.0.101:3000/api/v1/attendance/create/report`,
+            //     `https://sjsc-backend-production.up.railway.app/api/v1/attendance/create/report`,
+            //     {
+            //         teacherId: parseInt(Tid),
+            //         classId: classValue,
+            //         sectionId: sectionValue || null,
+            //         groupId: groupValue || null,
+            //         shift: shiftValue || null,
+            //         date,
+            //         remarks: "",
+            //     },
+            //     {
+            //         headers: {
+            //             "Content-Type": "application/json",
+            //             Authorization: `Bearer ${token}`,
+            //         },
+            //     }
+            // );
+
+            const response = await api.post(`/attendance/create/report`, {
+                teacherId: parseInt(Tid),
+                classId: classValue,
+                sectionId: sectionValue || null,
+                groupId: groupValue || null,
+                shift: shiftValue || null,
+                date,
+                remarks: "",
+            });
 
             setSubmitting(false);
             if (response.data.message == "Attendance report created successfully") {
@@ -232,6 +247,7 @@ const TeacherDropdownForm = () => {
                     groupId: groupValue || null,
                     shift: shiftValue || null,
                     attendanceId: response.data.data.id,
+                    sort: sort || null,
                 });
                 // console.log(response.data);
             } else {
@@ -242,6 +258,7 @@ const TeacherDropdownForm = () => {
                         groupId: groupValue,
                         shift: shiftValue,
                         attendanceId: response?.data?.id,
+                        sort: sort || null,
                     });
                 } else {
                     alert(response.data.message);
@@ -458,6 +475,33 @@ const TeacherDropdownForm = () => {
                             display="default"
                             onChange={onChange}
                         />
+                    )}
+
+                    {/* Sort Dropdown */}
+                    {schoolValue === "college" && (
+                        <View style={styles.inputGroup}>
+                            <View style={styles.labelContainer}>
+                                <Ionicons name="filter" size={18} color="#6C63FF" />
+                                <Text style={styles.label}>Sort By</Text>
+                            </View>
+                            <View style={styles.dropdownWrapper}>
+                                <DropDownPicker
+                                    open={openSort}
+                                    value={sort}
+                                    items={[
+                                        { label: "Roll Number", value: "roll" },
+                                        { label: "Student ID", value: "sid" },
+                                    ]}
+                                    onOpen={() => setOpenSort(true)}
+                                    onClose={() => setOpenSort(false)}
+                                    setOpen={setOpenSort}
+                                    setValue={setSort}
+                                    style={styles.dropdown}
+                                    listMode='SCROLLVIEW'
+                                />
+                                <View style={styles.dropdownGlow} />
+                            </View>
+                        </View>
                     )}
 
                     {/* Submit Button */}
