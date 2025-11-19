@@ -97,6 +97,9 @@ const TeacherDropdownForm = () => {
     const [sectionValue, setSectionValue] = useState(null);
     const [sectionItems, setSectionItems] = useState([]);
 
+    // Has Section in Groups 
+    const [hasSectionInGroups, setHasSectionInGroups] = useState(false);
+
     // State for Sort Dropdown
     const [openSort, setOpenSort] = useState(false);
 
@@ -142,8 +145,6 @@ const TeacherDropdownForm = () => {
         }, [])
     );
 
-
-
     useEffect(() => {
         if (classValue && teacherData) {
             const groups = teacherData.assignedGroups
@@ -172,6 +173,17 @@ const TeacherDropdownForm = () => {
             setSectionValue(null);
         }
     }, [classValue, teacherData]);
+
+
+    useEffect(() => {
+        if (groupValue && teacherData) {
+            const selectedGroup = teacherData.assignedGroups.find(group => group.id === groupValue);
+            if (selectedGroup && selectedGroup.hasSection) {
+                setHasSectionInGroups(selectedGroup.hasSection);
+            }
+            console.log(selectedGroup);
+        }
+    }, [groupValue]);
 
     const handleSubmit = async () => {
         try {
@@ -398,56 +410,60 @@ const TeacherDropdownForm = () => {
                     </View>
 
                     {/* Group Dropdown */}
-                    <View style={styles.inputGroup}>
-                        <View style={styles.labelContainer}>
-                            <Ionicons name="people" size={18} color="#FFD93D" />
-                            <Text style={styles.label}>Group</Text>
+                    {groupItems?.length > 0 && (
+                        <View style={styles.inputGroup}>
+                            <View style={styles.labelContainer}>
+                                <Ionicons name="people" size={18} color="#FFD93D" />
+                                <Text style={styles.label}>Group</Text>
+                            </View>
+                            <View style={styles.dropdownWrapper}>
+                                <DropDownPicker
+                                    open={openGroup}
+                                    value={groupValue}
+                                    items={groupItems}
+                                    setOpen={setOpenGroup}
+                                    setValue={setGroupValue}
+                                    setItems={setGroupItems}
+                                    placeholder="👥 Select Group"
+                                    style={[styles.dropdown, !classValue && styles.disabledDropdown]}
+                                    textStyle={styles.dropdownText}
+                                    zIndex={2000}
+                                    listMode="SCROLLVIEW"
+                                    disabled={!classValue}
+                                    dropDownContainerStyle={styles.dropdownContainer}
+                                />
+                                <View style={styles.dropdownGlow} />
+                            </View>
                         </View>
-                        <View style={styles.dropdownWrapper}>
-                            <DropDownPicker
-                                open={openGroup}
-                                value={groupValue}
-                                items={groupItems}
-                                setOpen={setOpenGroup}
-                                setValue={setGroupValue}
-                                setItems={setGroupItems}
-                                placeholder="👥 Select Group"
-                                style={[styles.dropdown, !classValue && styles.disabledDropdown]}
-                                textStyle={styles.dropdownText}
-                                zIndex={2000}
-                                listMode="SCROLLVIEW"
-                                disabled={!classValue}
-                                dropDownContainerStyle={styles.dropdownContainer}
-                            />
-                            <View style={styles.dropdownGlow} />
-                        </View>
-                    </View>
+                    )}
 
                     {/* Section Dropdown */}
-                    <View style={styles.inputGroup}>
-                        <View style={styles.labelContainer}>
-                            <Ionicons name="grid" size={18} color="#A8E6CF" />
-                            <Text style={styles.label}>Section</Text>
+                    {(!groupItems?.length > 0 ||  hasSectionInGroups) && (
+                        <View style={styles.inputGroup}>
+                            <View style={styles.labelContainer}>
+                                <Ionicons name="grid" size={18} color="#A8E6CF" />
+                                <Text style={styles.label}>Section</Text>
+                            </View>
+                            <View style={styles.dropdownWrapper}>
+                                <DropDownPicker
+                                    open={openSection}
+                                    value={sectionValue}
+                                    items={sectionItems}
+                                    setOpen={setOpenSection}
+                                    setValue={setSectionValue}
+                                    setItems={setSectionItems}
+                                    placeholder="📝 Select Section"
+                                    style={[styles.dropdown, !classValue && styles.disabledDropdown]}
+                                    textStyle={styles.dropdownText}
+                                    zIndex={1000}
+                                    listMode="SCROLLVIEW"
+                                    disabled={!classValue}
+                                    dropDownContainerStyle={styles.dropdownContainer}
+                                />
+                                <View style={styles.dropdownGlow} />
+                            </View>
                         </View>
-                        <View style={styles.dropdownWrapper}>
-                            <DropDownPicker
-                                open={openSection}
-                                value={sectionValue}
-                                items={sectionItems}
-                                setOpen={setOpenSection}
-                                setValue={setSectionValue}
-                                setItems={setSectionItems}
-                                placeholder="📝 Select Section"
-                                style={[styles.dropdown, !classValue && styles.disabledDropdown]}
-                                textStyle={styles.dropdownText}
-                                zIndex={1000}
-                                listMode="SCROLLVIEW"
-                                disabled={!classValue}
-                                dropDownContainerStyle={styles.dropdownContainer}
-                            />
-                            <View style={styles.dropdownGlow} />
-                        </View>
-                    </View>
+                    )}
 
                     {/* Date Picker */}
                     <View style={styles.inputGroup}>

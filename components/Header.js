@@ -3,6 +3,7 @@ import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTeacher } from '../hooks';
+import appConfig from '../app.json';
 
 const Header = () => {
     const navigation = useNavigation();
@@ -31,6 +32,7 @@ const Header = () => {
                     <View style={styles.textContainer}>
                         <Text style={styles.headerTextBold}>SJSC Teachers</Text>
                         <Text style={styles.headerSubtext}>Welcome, {teacher?.name || "Teacher"}</Text>
+                        <Text style={styles.versionText}>v{appConfig.expo.version}</Text>
                     </View>
                 </View>
 
@@ -135,6 +137,12 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginTop: 2,
         letterSpacing: 0.3,
+    },
+    versionText: {
+        fontSize: 10,
+        color: 'rgba(255,255,255,0.6)',
+        fontWeight: '400',
+        marginTop: 1,
     },
     profileButton: {
         flexDirection: 'row',

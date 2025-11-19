@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 
 // Get the API base URL from app.json
 const API_BASE_URL = Constants.expoConfig?.extra?.API || 'https://sjsc-backend-production.up.railway.app/api/v1';
-// const API_BASE_URL = 'http://192.168.0.104:3000/api/v1';
+// const API_BASE_URL = 'http://192.168.0.107:3000/api/v1';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({

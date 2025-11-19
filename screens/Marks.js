@@ -97,6 +97,9 @@ const Marks = () => {
     const [subjectValue, setSubjectValue] = useState(null);
     const [subjectItems, setSubjectItems] = useState([]);
 
+    // has section in groups
+    const [hasSectionInGroups, setHasSectionInGroups] = useState(false);
+
     // Fetch Teacher Data
     useEffect(() => {
         const fetchTeacherData = async () => {
@@ -178,6 +181,17 @@ const Marks = () => {
         }
     }, [classValue, teacherData]);
 
+    useEffect(() => {
+        if (groupValue && teacherData) {
+            const selectedGroup = teacherData.assignedGroups.find(group => group.id === groupValue);
+            if (selectedGroup && selectedGroup.hasSection) {
+                setHasSectionInGroups(true);
+            } else {
+                setHasSectionInGroups(false);
+            }
+        }
+    }, [groupValue]);
+
 
     // Update Section Items when Group is selected
     useEffect(() => {
@@ -199,8 +213,8 @@ const Marks = () => {
 
     const TakeMarks = async () => {
         try {
-            if(!examValue) return alert("Please select an exam");
-            if(!subjectValue) return alert("Please select a subject");
+            if (!examValue) return alert("Please select an exam");
+            if (!subjectValue) return alert("Please select a subject");
             const Tid = await getTeacherId();
             const payload = {
                 teacherId: parseInt(Tid),
@@ -397,56 +411,60 @@ const Marks = () => {
                             </View>
 
                             {/* Group Dropdown */}
-                            <View style={styles.inputGroup}>
-                                <View style={styles.labelContainer}>
-                                    <Ionicons name="people" size={18} color="#FFD93D" />
-                                    <Text style={styles.label}>Group</Text>
+                            {groupItems?.length > 0 && (
+                                <View style={styles.inputGroup}>
+                                    <View style={styles.labelContainer}>
+                                        <Ionicons name="people" size={18} color="#FFD93D" />
+                                        <Text style={styles.label}>Group</Text>
+                                    </View>
+                                    <View style={styles.dropdownWrapper}>
+                                        <DropDownPicker
+                                            open={openGroup}
+                                            value={groupValue}
+                                            items={groupItems}
+                                            setOpen={setOpenGroup}
+                                            setValue={setGroupValue}
+                                            setItems={setGroupItems}
+                                            placeholder="👥 Select Group"
+                                            style={[styles.dropdown, !classValue && styles.disabledDropdown]}
+                                            textStyle={styles.dropdownText}
+                                            zIndex={2000}
+                                            listMode="SCROLLVIEW"
+                                            disabled={!classValue}
+                                            dropDownContainerStyle={styles.dropdownContainer}
+                                        />
+                                        <View style={styles.dropdownGlow} />
+                                    </View>
                                 </View>
-                                <View style={styles.dropdownWrapper}>
-                                    <DropDownPicker
-                                        open={openGroup}
-                                        value={groupValue}
-                                        items={groupItems}
-                                        setOpen={setOpenGroup}
-                                        setValue={setGroupValue}
-                                        setItems={setGroupItems}
-                                        placeholder="👥 Select Group"
-                                        style={[styles.dropdown, !classValue && styles.disabledDropdown]}
-                                        textStyle={styles.dropdownText}
-                                        zIndex={2000}
-                                        listMode="SCROLLVIEW"
-                                        disabled={!classValue}
-                                        dropDownContainerStyle={styles.dropdownContainer}
-                                    />
-                                    <View style={styles.dropdownGlow} />
-                                </View>
-                            </View>
+                            )}
 
                             {/* Section Dropdown */}
-                            <View style={styles.inputGroup}>
-                                <View style={styles.labelContainer}>
-                                    <Ionicons name="grid" size={18} color="#A8E6CF" />
-                                    <Text style={styles.label}>Section</Text>
+                            {(!groupItems?.length > 0 || hasSectionInGroups) && (
+                                <View style={styles.inputGroup}>
+                                    <View style={styles.labelContainer}>
+                                        <Ionicons name="grid" size={18} color="#A8E6CF" />
+                                        <Text style={styles.label}>Section</Text>
+                                    </View>
+                                    <View style={styles.dropdownWrapper}>
+                                        <DropDownPicker
+                                            open={openSection}
+                                            value={sectionValue}
+                                            items={sectionItems}
+                                            setOpen={setOpenSection}
+                                            setValue={setSectionValue}
+                                            setItems={setSectionItems}
+                                            placeholder="📝 Select Section"
+                                            style={[styles.dropdown, !classValue && styles.disabledDropdown]}
+                                            textStyle={styles.dropdownText}
+                                            zIndex={1000}
+                                            listMode="SCROLLVIEW"
+                                            disabled={!classValue}
+                                            dropDownContainerStyle={styles.dropdownContainer}
+                                        />
+                                        <View style={styles.dropdownGlow} />
+                                    </View>
                                 </View>
-                                <View style={styles.dropdownWrapper}>
-                                    <DropDownPicker
-                                        open={openSection}
-                                        value={sectionValue}
-                                        items={sectionItems}
-                                        setOpen={setOpenSection}
-                                        setValue={setSectionValue}
-                                        setItems={setSectionItems}
-                                        placeholder="📝 Select Section"
-                                        style={[styles.dropdown, !classValue && styles.disabledDropdown]}
-                                        textStyle={styles.dropdownText}
-                                        zIndex={1000}
-                                        listMode="SCROLLVIEW"
-                                        disabled={!classValue}
-                                        dropDownContainerStyle={styles.dropdownContainer}
-                                    />
-                                    <View style={styles.dropdownGlow} />
-                                </View>
-                            </View>
+                            )}
 
                             {/* Exam Dropdown */}
                             <View style={styles.inputGroup}>
@@ -501,11 +519,11 @@ const Marks = () => {
                             </View>
 
                             {/* Submit Button show if groupItems and sectionItems are exist then groupValue and sectionValue must */}
-                            {classValue && (hasGroupAndSection || hasOnlyGroup || hasOnlySection) && (
+                            {classValue && (groupValue || sectionValue) && (examValue || subjectValue) && (
                                 <Animated.View style={[styles.submitWrapper, { opacity: fadeAnim }]}>
-                                    <TouchableOpacity  
-                                        style={[styles.submitButton, submitting && styles.submittingButton]} 
-                                        onPress={TakeMarks} 
+                                    <TouchableOpacity
+                                        style={[styles.submitButton, submitting && styles.submittingButton]}
+                                        onPress={TakeMarks}
                                         disabled={submitting}
                                     >
                                         <View style={styles.submitContent}>

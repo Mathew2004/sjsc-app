@@ -428,8 +428,8 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     cardWrapper: {
-        width: '48%',
-        marginBottom: 15,
+        // width: '4%',
+        marginBottom: 12,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
